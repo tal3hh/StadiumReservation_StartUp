@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using RepositoryLayer.Contexts;
 using ServiceLayer.Dtos.Reservation.Home;
 using ServiceLayer.Dtos.Stadium.Home;
+using ServiceLayer.Utlities;
+using ServiceLayer.ViewModels;
 
 namespace WebApi.Controllers
 {
@@ -33,8 +35,25 @@ namespace WebApi.Controllers
             return Ok(azerbaijanDateTime);
         }
 
+        private Paginate<T> PaginateItems<T>(List<T> list, int page, int take)
+        {
+            take = take > 0 ? take : 10;
+
+            int totalPages = (int)Math.Ceiling(list.Count / (double)take);
+
+            int currentPage = page > 0 ? page : 1;
+
+            var paginatedResult = list
+                .Skip((page - 1) * take)
+                .Take(take)
+                .ToList();
+
+            return new Paginate<T>(paginatedResult, currentPage, totalPages);
+        }
+
+
         //Butun stadionlarin isyahisi (bos 3 saat)
-        [HttpGet("all-stadiums/empty-hours")]
+        [HttpGet("all-stadiums")]
         public async Task<IActionResult> GetAllStadiumsEmptyHours()
         {
             var stadiums = await _context.Stadiums
@@ -71,7 +90,8 @@ namespace WebApi.Controllers
                     name = stadium.Name,
                     phoneNumber = stadium.PhoneNumber,
                     addres = stadium.Address,
-                    price = stadium.Price,
+                    minPrice = stadium.minPrice,
+                    maxPrice = stadium.maxPrice,
                     emptyDates = availableHourRanges
                 };
             }).ToList();
@@ -79,8 +99,120 @@ namespace WebApi.Controllers
             return Ok(allStadiumsEmptyHours);
         }
 
+        [HttpPost("all-stadiums/Pagine")]
+        public async Task<IActionResult> GetPagineStadiumsAsync(StadiumVM vm)
+        {
+            var now = DateTime.Now;
+            var today = now.Date;
+            var nowHour = now.Hour + 1;
+
+            var allStadiumsEmptyHours = await _context.Stadiums
+                .AsNoTracking()
+                .Include(s => s.Areas)
+                .ThenInclude(a => a.Reservations)
+                .ToListAsync();
+
+            var paginatedStadiums = allStadiumsEmptyHours
+                .Select(stadium =>
+                {
+                    var reservedHours = stadium.Areas
+                        .SelectMany(a => a.Reservations)
+                        .Where(r =>
+                            r.Date.Date == today &&
+                            r.Date.Hour >= nowHour &&
+                            r.Date < today.AddDays(1) &&
+                            stadium.Areas.Any(a => a.Reservations.Any(x => x.Date.Hour == r.Date.Hour && x.Id != r.Id))
+                        )
+                        .Select(r => r.Date.Hour)
+                        .Distinct()
+                        .ToList();
+
+                    var availableHourRanges = Enumerable.Range(nowHour, 24 - nowHour)
+                        .Except(reservedHours)
+                        .Select(h => $"{h:00}:00-{(h + 1):00}:00")
+                        .Take(3)
+                        .ToList();
+
+                    return new HomeListStadiumDto
+                    {
+                        name = stadium.Name,
+                        phoneNumber = stadium.PhoneNumber,
+                        addres = stadium.Address,
+                        minPrice = stadium.minPrice,
+                        maxPrice = stadium.maxPrice,
+                        emptyDates = availableHourRanges
+                    };
+                })
+                .ToList();
+
+            // Paginate
+            var paginateResult = PaginateItems(paginatedStadiums,vm.page,vm.take);
+
+            return Ok(paginateResult);
+        }
+
+        [HttpPost("all-stadiums/Search/Pagine")]
+        public async Task<IActionResult> GetSearchPagineStadiumsAsync(SearchStadiumVM vm)
+        {
+            var now = DateTime.Now;
+            var today = now.Date;
+            var nowHour = now.Hour + 1;
+
+            var allStadiumsEmptyHours = await _context.Stadiums
+                .AsNoTracking()
+                .Include(s => s.Areas)
+                .ThenInclude(a => a.Reservations)
+                .Where(x=> x.Name.Contains(vm.search.Trim()))
+                .ToListAsync();
+
+            var paginatedStadiums = allStadiumsEmptyHours
+                .Select(stadium =>
+                {
+                    var reservedHours = stadium.Areas
+                        .SelectMany(a => a.Reservations)
+                        .Where(r =>
+                            r.Date.Date == today &&
+                            r.Date.Hour >= nowHour &&
+                            r.Date < today.AddDays(1) &&
+                            stadium.Areas.Any(a => a.Reservations.Any(x => x.Date.Hour == r.Date.Hour && x.Id != r.Id))
+                        )
+                        .Select(r => r.Date.Hour)
+                        .Distinct()
+                        .ToList();
+
+                    var availableHourRanges = Enumerable.Range(nowHour, 24 - nowHour)
+                        .Except(reservedHours)
+                        .Select(h => $"{h:00}:00-{(h + 1):00}:00")
+                        .Take(3)
+                        .ToList();
+
+                    return new HomeListStadiumDto
+                    {
+                        name = stadium.Name,
+                        phoneNumber = stadium.PhoneNumber,
+                        addres = stadium.Address,
+                        minPrice = stadium.minPrice,
+                        maxPrice = stadium.maxPrice,
+                        emptyDates = availableHourRanges
+                    };
+                })
+                .ToList();
+
+            // Paginate
+            var paginateResult = PaginateItems(paginatedStadiums, vm.page, vm.take);
+
+            return Ok(paginateResult);
+        }
+
+        [HttpPost("all-stadiums/Filter/Pagine")]
+        public async Task<IActionResult> GetFilterPagineStadiumsAsync(FilterStadiumVM vm)
+        {
+            
+            return Ok();
+        }
+
         //Stadionun detallari sehifesinde gorsenecek (Bos saatlar olacag)
-        [HttpGet("{stadiumId}/stadiumDetail-empty-hours")]
+        [HttpGet("{stadiumId}/stadiumDetail")]
         public async Task<IActionResult> StadiumDetailEmptyHour(int stadiumId)
         {
             Stadium? stadium = await _context.Stadiums
@@ -116,7 +248,7 @@ namespace WebApi.Controllers
                 name = stadium.Name,
                 phoneNumber = stadium.PhoneNumber,
                 addres = stadium.Address,
-                price = stadium.Price,
+                price = stadium.minPrice,
                 description = stadium.Description,
                 view = stadium.View,
                 emptyDates = availableHourRanges

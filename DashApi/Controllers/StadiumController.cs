@@ -48,7 +48,7 @@ namespace DashApi.Controllers
         }
 
         [HttpPut("upadteStadium")]
-        public async Task<IActionResult> addStadium(UpdateStadiumDto dto)
+        public async Task<IActionResult> upadteStadium(UpdateStadiumDto dto)
         {
             if (!ModelState.IsValid) return BadRequest(dto);
 

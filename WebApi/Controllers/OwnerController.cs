@@ -51,7 +51,7 @@ namespace WebApi.Controllers
             var stadiumDto = new HomeStadiumDto
             {
                 name = stadium.Name,
-                price = stadium.Price,
+                price = stadium.minPrice,
                 addres = stadium.Address,
                 phoneNumber = stadium.PhoneNumber,
                 Dates = reservationDtos

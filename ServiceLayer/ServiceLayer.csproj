@@ -13,8 +13,6 @@
   <ItemGroup>
     <Folder Include="Dtos\Area\Home\" />
     <Folder Include="Extensions\" />
-    <Folder Include="Utlities\" />
-    <Folder Include="ViewModels\" />
     <Folder Include="Validations\" />
     <Folder Include="Services\" />
   </ItemGroup>
