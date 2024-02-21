@@ -3,6 +3,7 @@ using DomainLayer.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using RepositoryLayer.Contexts;
 using ServiceLayer.Dtos.Stadium.Dash;
 
@@ -52,11 +53,14 @@ namespace DashApi.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(dto);
 
-            Stadium? stadium = await _context.Stadiums.SingleOrDefaultAsync(x => x.Id == dto.Id);
+            Stadium? DBstadium = await _context.Stadiums.SingleOrDefaultAsync(x => x.Id == dto.Id);
 
-            if (stadium is null) return NotFound();
+            if (DBstadium is null) return NotFound();
 
-            _context.Stadiums.Update(stadium);
+            Stadium stadium = _mapper.Map<Stadium>(dto);
+
+            _context.Entry(DBstadium).CurrentValues.SetValues(stadium);
+
             await _context.SaveChangesAsync();
 
             return Ok();

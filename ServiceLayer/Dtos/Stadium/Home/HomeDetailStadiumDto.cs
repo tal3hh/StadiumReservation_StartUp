@@ -15,6 +15,14 @@ namespace ServiceLayer.Dtos.Stadium.Home
         public string? phoneNumber { get; set; }
         public string? description { get; set; }
         public int view { get; set; }
+
+        public string? OpenDay { get; set; }
+        public string? CloseDay { get; set; }
+        public DateTime OpenTime { get; set; }
+        public DateTime CloseTime { get; set; }
+
         public List<string>? emptyDates { get; set; }
+
+        public List<StadiumImageDto> stadiumImages { get; set; }
     }
 }

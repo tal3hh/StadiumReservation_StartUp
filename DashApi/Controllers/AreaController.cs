@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RepositoryLayer.Contexts;
+using RepositoryLayer.Migrations;
 using ServiceLayer.Dtos.Area.Dash;
 
 namespace DashApi.Controllers
@@ -52,11 +53,14 @@ namespace DashApi.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(dto);
 
-            Area? Area = await _context.Areas.SingleOrDefaultAsync(x => x.Id == dto.Id);
+            Area? DBarea = await _context.Areas.SingleOrDefaultAsync(x => x.Id == dto.Id);
 
-            if (Area is null) return NotFound();
+            if (DBarea is null) return NotFound();
 
-            _context.Areas.Update(Area);
+            Area area = _mapper.Map<Area>(dto);
+
+            _context.Entry(DBarea).CurrentValues.SetValues(area);
+
             await _context.SaveChangesAsync();
 
             return Ok();

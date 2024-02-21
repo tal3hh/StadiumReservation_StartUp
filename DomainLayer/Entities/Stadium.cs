@@ -17,10 +17,13 @@ namespace DomainLayer.Entities
         public string? Description { get; set; }
         public int View { get; set; }
 
+        public string? OpenDay { get; set; }
+        public string? CloseDay { get; set; }
+        public DateTime OpenTime { get; set; }
+        public DateTime CloseTime { get; set; }
 
-        
+
+        public List<StadiumImage>? StadiumImages { get; set; }
         public List<Area>? Areas { get; set; }
-        //Hefte ici basqa saatlarda, Hefte sonu ferqli saat ola biler.
-        public List<OpenStadium>? OpenStadiums { get; set; }
     }
 }

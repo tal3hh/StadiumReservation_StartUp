@@ -6,12 +6,10 @@ using System.Threading.Tasks;
 
 namespace DomainLayer.Entities
 {
-    public class OpenStadium : BaseEntity
+    public class StadiumImage : BaseEntity
     {
-        public string? OpenDay { get; set; }
-        public string? CloseDay { get; set; }
-        public string? OpenTime { get; set; }
-        public string? CloseTime { get; set; }
+        public string? Path { get; set; }
+        public bool Main { get; set; }
 
         public int StadiumId { get; set; }
         public Stadium? Stadium { get; set; }

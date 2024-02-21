@@ -30,6 +30,7 @@ namespace ServiceLayer.AutoMapper
             CreateMap<Area, CreateAreaDto>().ReverseMap();
             CreateMap<Area, UpdateAreaDto>().ReverseMap();
 
+            CreateMap<StadiumImage, CreateStadiumImageDto>().ReverseMap();
         }
     }
 }

@@ -59,11 +59,14 @@ namespace DashApi.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(dto);
 
-            Reservation? reservation = await _context.Reservations.SingleOrDefaultAsync(x => x.Id == dto.Id);
+            Reservation? DBrezerv = await _context.Reservations.SingleOrDefaultAsync(x => x.Id == dto.Id);
 
-            if (reservation is null) return NotFound();
+            if (DBrezerv is null) return NotFound();
 
-            _context.Reservations.Update(reservation);
+            Reservation rezerv = _mapper.Map<Reservation>(dto);
+
+            _context.Entry(DBrezerv).CurrentValues.SetValues(rezerv);
+
             await _context.SaveChangesAsync();
 
             return Ok();

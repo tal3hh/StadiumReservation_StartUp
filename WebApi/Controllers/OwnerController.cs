@@ -3,8 +3,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RepositoryLayer.Contexts;
+using ServiceLayer.Dtos.Reservation.Dash;
 using ServiceLayer.Dtos.Reservation.Home;
 using ServiceLayer.Dtos.Stadium.Home;
+using ServiceLayer.ViewModels;
 
 namespace WebApi.Controllers
 {
@@ -19,8 +21,8 @@ namespace WebApi.Controllers
             _context = context;
         }
 
-        // Rezerv olunanlar (indiki vaxtdan sonralar)
-        [HttpGet("{stadiumId}/reservations-hours-byNames")]
+        // REZERVLER (indiki vaxtdan sonralar)
+        [HttpGet("{stadiumId}/Reservations/AfterNow")]
         public async Task<IActionResult> GetFutureReservations(int stadiumId)
         {
             Stadium? stadium = await _context.Stadiums
@@ -58,6 +60,38 @@ namespace WebApi.Controllers
             };
 
             return Ok(stadiumDto);
+        }
+
+        [HttpPost("{stadiumId}/Reservations/dateFilter")]
+        public async Task<IActionResult> StadiumDetailDate(int stadiumId, OwnerReservFilter vm)
+        {
+            Stadium? stadium = await _context.Stadiums
+                        .AsNoTracking()
+                        .Include(s => s.Areas)
+                        .ThenInclude(a => a.Reservations)
+                        .FirstOrDefaultAsync(s => s.Id == stadiumId);
+
+            if (stadium == null)
+                return NotFound($"Stadium with Id {stadiumId} not found.");
+
+            var reservationDtos = stadium.Areas
+                .SelectMany(a => a.Reservations)
+                .Where(r => r.Date.Date >= vm.startDate.Date &&
+                            r.Date.Date <= vm.endDate.Date
+                            )
+                .OrderBy(x => x.Date)
+                .Select(r => new OwnerReservDto
+                {
+                    byName = r.ByName,
+                    phoneNumber = r.PhoneNumber,
+                    Price = r.Price,
+                    areaName = r.Area.Name,
+                    hour = $"{r.Date.ToString("HH:00")}-{r.Date.AddHours(1).ToString("HH:00")}",
+                    date = r.Date.ToString("dd/MMMM/yyyy")
+                })
+                .ToList();
+
+            return Ok(reservationDtos);
         }
     }
 }
