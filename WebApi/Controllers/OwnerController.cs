@@ -1,8 +1,10 @@
 ﻿using DomainLayer.Entities;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RepositoryLayer.Contexts;
+using ServiceLayer.Dtos.Account;
 using ServiceLayer.Dtos.Reservation.Dash;
 using ServiceLayer.Dtos.Reservation.Home;
 using ServiceLayer.Dtos.Stadium.Home;
@@ -10,18 +12,69 @@ using ServiceLayer.ViewModels;
 
 namespace WebApi.Controllers
 {
+
     [Route("api/[controller]")]
     [ApiController]
     public class OwnerController : ControllerBase
     {
         private readonly AppDbContext _context;
-
-        public OwnerController(AppDbContext context)
+        private readonly UserManager<AppUser> _userManager;
+        public OwnerController(AppDbContext context, UserManager<AppUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
-        // REZERVLER (indiki vaxtdan sonralar)
+        //ADD
+        [HttpPost("Owner")]
+        public async Task<IActionResult> Register(UserCreateDto dto)
+        {
+            if (!ModelState.IsValid) return BadRequest(dto);
+
+            var user = new AppUser
+            {
+                Fullname = dto.Fullname,
+                UserName = dto.Username,
+                Email = dto.Email,
+                PhoneNumber = dto.Number,
+                CreateDate = DateTime.Now
+            };
+            IdentityResult identity = await _userManager.CreateAsync(user, dto.Password);
+
+            if (identity.Succeeded)
+            {
+                await _userManager.AddToRoleAsync(user, "Owner");
+                return Ok();
+            }
+
+            foreach (var error in identity.Errors)
+            {
+                ModelState.AddModelError("", error.Description);
+            }
+            return BadRequest(dto);
+        }
+
+        
+        //LIST
+        [HttpGet("Owners")]
+        public async Task<IActionResult> GetUsers()
+        {
+            var ownerUsers = await _userManager.GetUsersInRoleAsync("Owner");
+
+            List<UserDto> userDtos = ownerUsers.Select(user => new UserDto
+            {
+                Fullname = user.Fullname,
+                Username = user.UserName,
+                Email = user.Email,
+                Phone = user.PhoneNumber,
+                CreateDate = user.CreateDate
+            }).ToList();
+
+            return Ok(userDtos);
+        }
+
+
+        // REZERVLER 
         [HttpGet("{stadiumId}/Reservations/AfterNow")]
         public async Task<IActionResult> GetFutureReservations(int stadiumId)
         {

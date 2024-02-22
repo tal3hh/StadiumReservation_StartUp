@@ -64,7 +64,7 @@ namespace WebApi.Controllers
 
             if (identity.Succeeded)
             {
-                await _userManager.AddToRoleAsync(user, "Owner");
+                await _userManager.AddToRoleAsync(user, "Admin");
 
                 return Ok();
             }

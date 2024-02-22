@@ -22,28 +22,6 @@ builder.Services.AddAuthorization();
 
 builder.Services.AddTransient<ITokenService, TokenService>();
 
-#region Identity
-
-builder.Services.AddIdentity<AppUser, IdentityRole>(opt =>
-{
-    opt.Password.RequireNonAlphanumeric = false;  //Simvollardan biri olmalidir(@,/,$) 
-    opt.Password.RequireLowercase = false;       //Mutleq Kicik herf
-    opt.Password.RequireUppercase = false;       //Mutleq Boyuk herf 
-    opt.Password.RequiredLength = 4;            //Min. simvol sayi
-    opt.Password.RequireDigit = false;
-
-    opt.User.RequireUniqueEmail = true;
-
-    opt.SignIn.RequireConfirmedEmail = false;
-    opt.SignIn.RequireConfirmedAccount = false;
-
-    //opt.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(1); //Sifreni 5 defe sehv girdikde hesab 1dk baglanir.
-    //opt.Lockout.MaxFailedAccessAttempts = 5;                      //Sifreni max. 5defe sehv girmek olar.
-
-}).AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
-
-#endregion
-
 
 #region JWT
 
@@ -65,6 +43,29 @@ builder.Services.AddAuthentication(options =>
         ClockSkew = TimeSpan.Zero  // remove delay of token when expire
     };
 });
+#endregion
+
+
+#region Identity
+
+builder.Services.AddIdentity<AppUser, IdentityRole>(opt =>
+{
+    opt.Password.RequireNonAlphanumeric = false;  //Simvollardan biri olmalidir(@,/,$) 
+    opt.Password.RequireLowercase = false;       //Mutleq Kicik herf
+    opt.Password.RequireUppercase = false;       //Mutleq Boyuk herf 
+    opt.Password.RequiredLength = 4;            //Min. simvol sayi
+    opt.Password.RequireDigit = false;
+
+    opt.User.RequireUniqueEmail = true;
+
+    opt.SignIn.RequireConfirmedEmail = false;
+    opt.SignIn.RequireConfirmedAccount = false;
+
+    //opt.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(1); //Sifreni 5 defe sehv girdikde hesab 1dk baglanir.
+    //opt.Lockout.MaxFailedAccessAttempts = 5;                      //Sifreni max. 5defe sehv girmek olar.
+
+}).AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
+
 #endregion
 
 

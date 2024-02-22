@@ -300,7 +300,7 @@ namespace WebApi.Controllers
 
             if (stadium == null) return NotFound($"Stadium with Id {stadiumId} not found.");
 
-            return Ok(nowStadiumDetail(stadium));
+            return Ok(await nowStadiumDetail(stadium));
         }
 
         [HttpPost("stadiumDetail/dateFilter")]
@@ -339,7 +339,7 @@ namespace WebApi.Controllers
 
             return new Paginate<T>(paginatedResult, currentPage, totalPages);
         }
-        private HomeDetailStadiumDto nowStadiumDetail(Stadium stadium)
+        private async Task<HomeDetailStadiumDto> nowStadiumDetail(Stadium stadium)
         {
             var now = DateTime.Now;
             var today = now.Date;
@@ -353,8 +353,9 @@ namespace WebApi.Controllers
                     r.Date < today.AddDays(1) &&
                     stadium.Areas.Any(a => a.Reservations.Any(ar => ar.Date.Hour == r.Date.Hour && ar.Id != r.Id))
                 )
-                .Select(r => r.Date.Hour)
-                .Distinct()
+                .GroupBy(r => r.Date.Hour)
+                .Where(grp => grp.Count() == stadium.Areas.Count)
+                .Select(grp => grp.Key)
                 .ToList();
 
             var availableHourRanges = Enumerable.Range(0, 24)

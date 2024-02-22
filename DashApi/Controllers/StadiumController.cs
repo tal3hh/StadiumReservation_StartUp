@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
+using AutoMapper.Configuration.Annotations;
 using DomainLayer.Entities;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
@@ -13,12 +15,14 @@ namespace DashApi.Controllers
     [ApiController]
     public class StadiumController : ControllerBase
     {
+        private readonly UserManager<AppUser> _userManager;
         private readonly AppDbContext _context;
         private readonly IMapper _mapper;
-        public StadiumController(AppDbContext context, IMapper mapper)
+        public StadiumController(AppDbContext context, IMapper mapper, UserManager<AppUser> userManager)
         {
             _context = context;
             _mapper = mapper;
+            _userManager = userManager;
         }
 
         [HttpGet("Stadiums")]
@@ -37,6 +41,9 @@ namespace DashApi.Controllers
         public async Task<IActionResult> addStadium(CreateStadiumDto dto)
         {
             if (!ModelState.IsValid) return BadRequest(dto);
+
+            var user = await _userManager.FindByIdAsync(dto.AppUserId);
+            if (user is null) return NotFound("Istifadeci tapilmadi.");
 
             Stadium stadium = _mapper.Map<Stadium>(dto);
             stadium.CreateDate = DateTime.Now;
