@@ -8,6 +8,7 @@ namespace ServiceLayer.Dtos.Stadium.Dash
 {
     public class CreateStadiumDto
     {
+        public string? AppUserId { get; set; }
         public string? Name { get; set; }
         public string? City { get; set; }
         public decimal minPrice { get; set; }

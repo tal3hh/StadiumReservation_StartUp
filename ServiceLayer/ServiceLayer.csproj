@@ -14,7 +14,6 @@
     <Folder Include="Dtos\Area\Home\" />
     <Folder Include="Extensions\" />
     <Folder Include="Validations\" />
-    <Folder Include="Services\" />
   </ItemGroup>
 
   <ItemGroup>

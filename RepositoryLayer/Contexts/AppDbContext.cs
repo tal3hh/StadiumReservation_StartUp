@@ -18,6 +18,8 @@ namespace RepositoryLayer.Contexts
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Stadium>().HasOne(x => x.AppUser).WithOne(x => x.Stadium).HasForeignKey<Stadium>(x => x.AppUserId);
+
             modelBuilder.Entity<Reservation>().HasOne(x => x.Area).WithMany(x => x.Reservations).HasForeignKey(x => x.AreaId);
 
             modelBuilder.Entity<StadiumImage>().HasOne(x => x.Stadium).WithMany(x => x.StadiumImages).HasForeignKey(x => x.StadiumId);

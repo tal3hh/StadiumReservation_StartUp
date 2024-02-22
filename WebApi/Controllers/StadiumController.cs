@@ -292,7 +292,7 @@ namespace WebApi.Controllers
         public async Task<IActionResult> StadiumDetail(int stadiumId)
         {
             Stadium? stadium = await _context.Stadiums
-                .AsNoTracking()
+                     .AsNoTracking()
                      .Include(s => s.StadiumImages)
                      .Include(s => s.Areas)
                      .ThenInclude(a => a.Reservations)

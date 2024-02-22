@@ -9,6 +9,9 @@ namespace DomainLayer.Entities
 {
     public class AppUser : IdentityUser
     {
+        public string? Fullname { get; set; }
         public DateTime CreateDate { get; set; }
+
+        public Stadium? Stadium { get; set; }
     }
 }

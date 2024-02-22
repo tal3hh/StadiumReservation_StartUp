@@ -23,6 +23,8 @@ namespace DomainLayer.Entities
         public DateTime CloseTime { get; set; }
 
 
+        public string? AppUserId { get; set; }
+        public AppUser? AppUser { get; set; }
         public List<StadiumImage>? StadiumImages { get; set; }
         public List<Area>? Areas { get; set; }
     }

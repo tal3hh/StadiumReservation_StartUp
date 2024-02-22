@@ -44,6 +44,9 @@ namespace RepositoryLayer.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<string>("Fullname")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
 
@@ -170,6 +173,9 @@ namespace RepositoryLayer.Migrations
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("AppUserId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("City")
                         .HasColumnType("nvarchar(max)");
 
@@ -210,6 +216,10 @@ namespace RepositoryLayer.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AppUserId")
+                        .IsUnique()
+                        .HasFilter("[AppUserId] IS NOT NULL");
 
                     b.ToTable("Stadiums");
                 });
@@ -399,6 +409,15 @@ namespace RepositoryLayer.Migrations
                     b.Navigation("Area");
                 });
 
+            modelBuilder.Entity("DomainLayer.Entities.Stadium", b =>
+                {
+                    b.HasOne("DomainLayer.Entities.AppUser", "AppUser")
+                        .WithOne("Stadium")
+                        .HasForeignKey("DomainLayer.Entities.Stadium", "AppUserId");
+
+                    b.Navigation("AppUser");
+                });
+
             modelBuilder.Entity("DomainLayer.Entities.StadiumImage", b =>
                 {
                     b.HasOne("DomainLayer.Entities.Stadium", "Stadium")
@@ -459,6 +478,11 @@ namespace RepositoryLayer.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("DomainLayer.Entities.AppUser", b =>
+                {
+                    b.Navigation("Stadium");
                 });
 
             modelBuilder.Entity("DomainLayer.Entities.Area", b =>
