@@ -8,6 +8,8 @@ namespace ServiceLayer.ViewModels
 {
     public class FilterStadiumVM
     {
+        public string? City { get; set; }
+
         public decimal minPrice { get; set; }
         public decimal maxPrice { get; set; }
 

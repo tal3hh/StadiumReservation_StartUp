@@ -23,13 +23,19 @@ namespace DashApi.Controllers
         [HttpGet("Reservations")]
         public async Task<IActionResult> Reservations()
         {
-            return Ok(await _context.Reservations.ToListAsync());
+            var list = await _context.Reservations.Include(x => x.Area).ToListAsync();
+
+            return Ok(_mapper.Map<List<DashReservationDto>>(list));
         }
 
         [HttpGet("Reservations/{id}")]
         public async Task<IActionResult> FindReservations(int id)
         {
-            return Ok(await _context.Reservations.SingleOrDefaultAsync(x => x.Id == id));
+            var entity = await _context.Reservations.Include(x=> x.Area).SingleOrDefaultAsync(x => x.Id == id);
+
+            if (entity is null) return NotFound();
+
+            return Ok(_mapper.Map<DashReservationDto>(entity));
         }
 
         [HttpPost("addReservation")]

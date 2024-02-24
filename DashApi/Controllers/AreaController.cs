@@ -24,13 +24,17 @@ namespace DashApi.Controllers
         [HttpGet("Areas")]
         public async Task<IActionResult> Areas()
         {
-            return Ok(await _context.Areas.ToListAsync());
+            var list = await _context.Areas.Include(x => x.Stadium).ToListAsync();
+
+            return Ok(_mapper.Map<List<DashAreaDto>>(list));
         }
 
         [HttpGet("Area/{id}")]
         public async Task<IActionResult> Areas(int id)
         {
-            return Ok(await _context.Areas.SingleOrDefaultAsync(x => x.Id == id));
+            var entity = await _context.Areas.Include(x=> x.Stadium).SingleOrDefaultAsync(x => x.Id == id);
+
+            return Ok(_mapper.Map<DashAreaDto>(entity));
         }
 
         [HttpPost("addArea")]

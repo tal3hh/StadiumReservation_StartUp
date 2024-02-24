@@ -28,13 +28,17 @@ namespace DashApi.Controllers
         [HttpGet("Stadiums")]
         public async Task<IActionResult> Stadiums()
         {
-            return Ok(await _context.Stadiums.ToListAsync());
+            var list = await _context.Stadiums.Include(x => x.AppUser).ToListAsync();
+
+            return Ok(_mapper.Map<List<DashStadiumDto>>(list));
         }
 
         [HttpGet("Stadium/{id}")]
         public async Task<IActionResult> Stadiums(int id)
         {
-            return Ok(await _context.Stadiums.SingleOrDefaultAsync(x => x.Id == id));
+            var entity = await _context.Stadiums.Include(x => x.AppUser).SingleOrDefaultAsync(x => x.Id == id);
+
+            return Ok(_mapper.Map<DashStadiumDto>(entity));
         }
 
         [HttpPost("addStadium")]
