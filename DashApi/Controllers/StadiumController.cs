@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using RepositoryLayer.Contexts;
 using ServiceLayer.Dtos.Stadium.Dash;
+using ServiceLayer.Services.Interface;
 
 namespace DashApi.Controllers
 {
@@ -16,29 +17,24 @@ namespace DashApi.Controllers
     public class StadiumController : ControllerBase
     {
         private readonly UserManager<AppUser> _userManager;
-        private readonly AppDbContext _context;
-        private readonly IMapper _mapper;
-        public StadiumController(AppDbContext context, IMapper mapper, UserManager<AppUser> userManager)
+        private readonly IStadiumService _stadiumService;
+
+        public StadiumController(UserManager<AppUser> userManager, IStadiumService stadiumService)
         {
-            _context = context;
-            _mapper = mapper;
             _userManager = userManager;
+            _stadiumService = stadiumService;
         }
 
         [HttpGet("Stadiums")]
         public async Task<IActionResult> Stadiums()
         {
-            var list = await _context.Stadiums.Include(x => x.AppUser).ToListAsync();
-
-            return Ok(_mapper.Map<List<DashStadiumDto>>(list));
+            return Ok(await _stadiumService.AllAsync());
         }
 
         [HttpGet("Stadium/{id}")]
-        public async Task<IActionResult> Stadiums(int id)
+        public async Task<IActionResult> FindBy(int id)
         {
-            var entity = await _context.Stadiums.Include(x => x.AppUser).SingleOrDefaultAsync(x => x.Id == id);
-
-            return Ok(_mapper.Map<DashStadiumDto>(entity));
+            return Ok(await _stadiumService.FindById(id));
         }
 
         [HttpPost("addStadium")]
@@ -49,12 +45,7 @@ namespace DashApi.Controllers
             var user = await _userManager.FindByIdAsync(dto.AppUserId);
             if (user is null) return NotFound("Istifadeci tapilmadi.");
 
-            Stadium stadium = _mapper.Map<Stadium>(dto);
-            stadium.CreateDate = DateTime.Now;
-            stadium.IsActive = true;
-
-            await _context.Stadiums.AddAsync(stadium);
-            await _context.SaveChangesAsync();
+            await _stadiumService.CreateAsync(dto);
 
             return Ok();
         }
@@ -64,15 +55,7 @@ namespace DashApi.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(dto);
 
-            Stadium? DBstadium = await _context.Stadiums.SingleOrDefaultAsync(x => x.Id == dto.Id);
-
-            if (DBstadium is null) return NotFound();
-
-            Stadium stadium = _mapper.Map<Stadium>(dto);
-
-            _context.Entry(DBstadium).CurrentValues.SetValues(stadium);
-
-            await _context.SaveChangesAsync();
+            await _stadiumService.UpdateAsync(dto);
 
             return Ok();
         }
@@ -80,12 +63,7 @@ namespace DashApi.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> removeStadium(int id)
         {
-            Stadium? stadium = await _context.Stadiums.SingleOrDefaultAsync(x => x.Id == id);
-
-            if (stadium is null) return NotFound();
-
-            _context.Stadiums.Remove(stadium);
-            await _context.SaveChangesAsync();
+            await _stadiumService.RemoveAsync(id);
 
             return Ok();
         }

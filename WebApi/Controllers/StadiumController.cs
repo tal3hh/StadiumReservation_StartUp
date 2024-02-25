@@ -55,8 +55,10 @@ namespace WebApi.Controllers
                     .Take(3)
                     .ToList();
 
+
                 return new HomeListStadiumDto
                 {
+                    Id = stadium.Id,
                     name = stadium.Name,
                     path = stadium.StadiumImages?.FirstOrDefault(x => x.Main)?.Path,
                     phoneNumber = stadium.PhoneNumber,
