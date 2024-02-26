@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RepositoryLayer.Contexts;
 using ServiceLayer.Dtos.Stadium.Dash;
+using ServiceLayer.Dtos.StadiumImage;
+using ServiceLayer.Services.Interface;
 
 namespace DashApi.Controllers
 {
@@ -12,24 +14,23 @@ namespace DashApi.Controllers
     [ApiController]
     public class StadiumImageController : ControllerBase
     {
-        private readonly AppDbContext _context;
-        private readonly IMapper _mapper;
-        public StadiumImageController(AppDbContext context, IMapper mapper)
+        private readonly IStadiumImageService _stadiumImageService;
+
+        public StadiumImageController(IStadiumImageService stadiumImageService)
         {
-            _context = context;
-            _mapper = mapper;
+            _stadiumImageService = stadiumImageService;
         }
 
         [HttpGet("StadiumImages")]
         public async Task<IActionResult> StadiumImages()
         {
-            return Ok(await _context.StadiumImages.ToListAsync());
+            return Ok(await _stadiumImageService.AllAsync());
         }
 
         [HttpGet("StadiumImage/{id}")]
         public async Task<IActionResult> StadiumImages(int id)
         {
-            return Ok(await _context.StadiumImages.SingleOrDefaultAsync(x => x.Id == id));
+            return Ok(await _stadiumImageService.FindById(id));
         }
 
         [HttpPost("addStadiumImage")]
@@ -37,12 +38,7 @@ namespace DashApi.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(dto);
 
-            StadiumImage StadiumImage = _mapper.Map<StadiumImage>(dto);
-            StadiumImage.CreateDate = DateTime.Now;
-            StadiumImage.IsActive = true;
-
-            await _context.StadiumImages.AddAsync(StadiumImage);
-            await _context.SaveChangesAsync();
+            await _stadiumImageService.CreateAsync(dto);
 
             return Ok();
         }
@@ -52,15 +48,7 @@ namespace DashApi.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(dto);
 
-            StadiumImage? DBstadiumimage = await _context.StadiumImages.SingleOrDefaultAsync(x => x.Id == dto.Id);
-
-            if (DBstadiumimage is null) return NotFound();
-
-            StadiumImage stadiumimage = _mapper.Map<StadiumImage>(dto);
-
-            _context.Entry(DBstadiumimage).CurrentValues.SetValues(stadiumimage);
-
-            await _context.SaveChangesAsync();
+            if (!await _stadiumImageService.UpdateAsync(dto)) return NotFound();
 
             return Ok();
         }
@@ -68,12 +56,7 @@ namespace DashApi.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> removeStadiumImage(int id)
         {
-            StadiumImage? StadiumImage = await _context.StadiumImages.SingleOrDefaultAsync(x => x.Id == id);
-
-            if (StadiumImage is null) return NotFound();
-
-            _context.StadiumImages.Remove(StadiumImage);
-            await _context.SaveChangesAsync();
+            if (!await _stadiumImageService.RemoveAsync(id)) return NotFound();
 
             return Ok();
         }

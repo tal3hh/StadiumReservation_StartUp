@@ -13,5 +13,6 @@ namespace ServiceLayer.Dtos.Account
         public string? Email { get; set; }
         public string? Phone { get; set; }
         public DateTime CreateDate { get; set; }
+        public List<string>? userRole { get; set; }
     }
 }

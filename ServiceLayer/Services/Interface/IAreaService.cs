@@ -9,9 +9,8 @@ namespace ServiceLayer.Services.Interface
 {
     public interface IAreaService
     {
-
-        Task RemoveAsync(int id);
-        Task UpdateAsync(UpdateAreaDto dto);
+        Task<bool> RemoveAsync(int id);
+        Task<bool> UpdateAsync(UpdateAreaDto dto);
         Task CreateAsync(CreateAreaDto dto);
         Task<DashAreaDto> FindById(int id);
         Task<List<DashAreaDto>> AllAsync();

@@ -1,10 +1,13 @@
 ﻿using AutoMapper;
 using DomainLayer.Entities;
+using Microsoft.AspNetCore.Identity;
+using ServiceLayer.Dtos.Account;
 using ServiceLayer.Dtos.Area.Dash;
 using ServiceLayer.Dtos.Reservation.Dash;
 using ServiceLayer.Dtos.Stadium;
 using ServiceLayer.Dtos.Stadium.Dash;
 using ServiceLayer.Dtos.Stadium.Home;
+using ServiceLayer.Dtos.StadiumImage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +18,7 @@ namespace ServiceLayer.AutoMapper
 {
     public class MappingProofile : Profile
     {
+       
         public MappingProofile()
         {
             //Home
@@ -42,7 +46,11 @@ namespace ServiceLayer.AutoMapper
             CreateMap<DashAreaDto, Area>();
 
 
+            CreateMap<StadiumImage, DashStadiumImageDto>()
+                .ForMember(x => x.stadiumName, y => y.MapFrom(z => z.Stadium.Name));
+            CreateMap<DashStadiumImageDto, StadiumImage>();
             CreateMap<StadiumImage, CreateStadiumImageDto>().ReverseMap();
+            CreateMap<StadiumImage, UpdateStadiumImageDto>().ReverseMap();
         }
     }
 }

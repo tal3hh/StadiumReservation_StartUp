@@ -27,7 +27,7 @@ namespace WebApi.Controllers
 
         //ADD
         [HttpPost("Owner/Register")]
-        public async Task<IActionResult> Register(UserCreateDto dto)
+        public async Task<IActionResult> Register(CreateUserDto dto)
         {
             if (!ModelState.IsValid) return BadRequest(dto);
 

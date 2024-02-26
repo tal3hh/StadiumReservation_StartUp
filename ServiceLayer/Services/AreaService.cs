@@ -42,7 +42,7 @@ namespace ServiceLayer.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task UpdateAsync(UpdateAreaDto dto)
+        public async Task<bool> UpdateAsync(UpdateAreaDto dto)
         {
             Area? DBarea = await _context.Areas.SingleOrDefaultAsync(x => x.Id == dto.Id);
 
@@ -53,10 +53,13 @@ namespace ServiceLayer.Services
                 _context.Entry(DBarea).CurrentValues.SetValues(area);
 
                 await _context.SaveChangesAsync();
+
+                return true;
             }
+            return false;
         }
 
-        public async Task RemoveAsync(int id)
+        public async Task<bool> RemoveAsync(int id)
         {
             Area? Area = await _context.Areas.SingleOrDefaultAsync(x => x.Id == id);
 
@@ -64,7 +67,9 @@ namespace ServiceLayer.Services
             {
                 _context.Areas.Remove(Area);
                 await _context.SaveChangesAsync();
+                return true;
             }
+            return false;
         }
     }
 }

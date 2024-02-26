@@ -6,21 +6,21 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using RepositoryLayer.Contexts;
-using ServiceLayer.Services.Interface;
-using ServiceLayer.Services;
-using System.Text;
 using ServiceLayer.AutoMapper;
+using ServiceLayer.Extensions;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
+//EXTRENSION
+builder.Services.AddServices();
+
 builder.Services.AddFluentValidationAutoValidation();
 
 builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
-
-builder.Services.AddTransient<ITokenService, TokenService>();
 
 
 #region JWT

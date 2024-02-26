@@ -48,7 +48,7 @@ namespace DashApi.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(dto);
 
-            await _areaService.UpdateAsync(dto);
+            if (!await _areaService.UpdateAsync(dto)) return NotFound();
 
             return Ok();
         }
@@ -56,7 +56,7 @@ namespace DashApi.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> removeArea(int id)
         {
-            await _areaService.RemoveAsync(id);
+            if (!await _areaService.RemoveAsync(id)) return NotFound();
 
             return Ok();
         }
