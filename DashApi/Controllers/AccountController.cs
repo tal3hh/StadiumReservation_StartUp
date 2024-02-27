@@ -78,7 +78,7 @@ namespace DashApi.Controllers
         #endregion
 
         #region Login
-        [HttpPost("Login")]
+        [HttpPost("Login(Admin)")]
         public async Task<IActionResult> Login(LoginUserDto dto)
         {
             if (!ModelState.IsValid) return BadRequest(dto);

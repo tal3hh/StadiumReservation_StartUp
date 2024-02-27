@@ -8,6 +8,7 @@ namespace ServiceLayer.Dtos.Account
 {
     public class OwnerDto
     {
+        public int stadiumId { get; set; }
         public string? Username { get; set; }
         public string? Fullname { get; set; }
         public string? Email { get; set; }

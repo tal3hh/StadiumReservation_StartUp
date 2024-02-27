@@ -8,6 +8,7 @@ namespace ServiceLayer.ViewModels
 {
     public class OwnerReservFilter
     {
+        public int stadiumId { get; set; }
         public DateTime startDate { get; set; }
         public DateTime endDate { get; set; }
     }
