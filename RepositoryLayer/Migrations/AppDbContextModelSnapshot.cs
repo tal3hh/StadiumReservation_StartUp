@@ -224,6 +224,33 @@ namespace RepositoryLayer.Migrations
                     b.ToTable("Stadiums");
                 });
 
+            modelBuilder.Entity("DomainLayer.Entities.StadiumDiscount", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Path")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("StadiumId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StadiumId");
+
+                    b.ToTable("StadiumDiscounts");
+                });
+
             modelBuilder.Entity("DomainLayer.Entities.StadiumImage", b =>
                 {
                     b.Property<int>("Id")
@@ -418,6 +445,17 @@ namespace RepositoryLayer.Migrations
                     b.Navigation("AppUser");
                 });
 
+            modelBuilder.Entity("DomainLayer.Entities.StadiumDiscount", b =>
+                {
+                    b.HasOne("DomainLayer.Entities.Stadium", "Stadium")
+                        .WithMany("StadiumDiscounts")
+                        .HasForeignKey("StadiumId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Stadium");
+                });
+
             modelBuilder.Entity("DomainLayer.Entities.StadiumImage", b =>
                 {
                     b.HasOne("DomainLayer.Entities.Stadium", "Stadium")
@@ -493,6 +531,8 @@ namespace RepositoryLayer.Migrations
             modelBuilder.Entity("DomainLayer.Entities.Stadium", b =>
                 {
                     b.Navigation("Areas");
+
+                    b.Navigation("StadiumDiscounts");
 
                     b.Navigation("StadiumImages");
                 });

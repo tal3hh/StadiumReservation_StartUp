@@ -7,6 +7,7 @@ using ServiceLayer.Dtos.Reservation.Dash;
 using ServiceLayer.Dtos.Stadium;
 using ServiceLayer.Dtos.Stadium.Dash;
 using ServiceLayer.Dtos.Stadium.Home;
+using ServiceLayer.Dtos.StadiumDiscount;
 using ServiceLayer.Dtos.StadiumImage;
 using System;
 using System.Collections.Generic;
@@ -51,6 +52,12 @@ namespace ServiceLayer.AutoMapper
             CreateMap<DashStadiumImageDto, StadiumImage>();
             CreateMap<StadiumImage, CreateStadiumImageDto>().ReverseMap();
             CreateMap<StadiumImage, UpdateStadiumImageDto>().ReverseMap();
+
+
+            CreateMap<StadiumDiscount, DashStadiumDiscountDto>()
+                .ForMember(x => x.stadiumName, y => y.MapFrom(z => z.Stadium.Name));
+            CreateMap<StadiumDiscount, CreateStadiumDiscountDto>().ReverseMap();
+            CreateMap<StadiumDiscount, UpdateStadiumDiscountDto>().ReverseMap();
         }
     }
 }

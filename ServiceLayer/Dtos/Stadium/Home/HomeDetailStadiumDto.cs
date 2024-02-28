@@ -22,6 +22,7 @@ namespace ServiceLayer.Dtos.Stadium.Home
         public DateTime CloseTime { get; set; }
 
         public List<string>? emptyDates { get; set; }
+        public List<string>? discounts { get; set; }
 
         public List<StadiumImageDto> stadiumImages { get; set; }
     }

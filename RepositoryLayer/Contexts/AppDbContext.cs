@@ -24,6 +24,8 @@ namespace RepositoryLayer.Contexts
 
             modelBuilder.Entity<StadiumImage>().HasOne(x => x.Stadium).WithMany(x => x.StadiumImages).HasForeignKey(x => x.StadiumId);
 
+            modelBuilder.Entity<StadiumDiscount>().HasOne(x => x.Stadium).WithMany(x => x.StadiumDiscounts).HasForeignKey(x => x.StadiumId);
+
             modelBuilder.Entity<Area>().HasOne(x => x.Stadium).WithMany(x => x.Areas).HasForeignKey(x => x.StadiumId);
             
             base.OnModelCreating(modelBuilder);
@@ -31,6 +33,7 @@ namespace RepositoryLayer.Contexts
 
         public DbSet<Stadium> Stadiums { get; set; }
         public DbSet<StadiumImage> StadiumImages { get; set; }
+        public DbSet<StadiumDiscount> StadiumDiscounts { get; set; }
         public DbSet<Area> Areas { get; set; }
         public DbSet<Reservation> Reservations { get; set; }
     }

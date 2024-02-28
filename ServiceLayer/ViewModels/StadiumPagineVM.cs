@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ServiceLayer.ViewModels
 {
-    public class StadiumVM
+    public class StadiumPagineVM
     {
         public int page { get; set; }
         public int take { get; set; }

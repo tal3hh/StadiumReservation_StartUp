@@ -15,6 +15,7 @@ namespace ServiceLayer.Extensions
         {
             services.AddScoped<IStadiumService, StadiumService>();
             services.AddScoped<IStadiumImageService, StadiumImageService>();
+            services.AddScoped<IStadiumDiscountService, StadiumDiscountService>();
             services.AddScoped<IAreaService, AreaService>();
             services.AddScoped<IReservationService, ReservationService>();
 

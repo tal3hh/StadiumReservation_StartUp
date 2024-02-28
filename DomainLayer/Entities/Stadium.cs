@@ -26,6 +26,7 @@ namespace DomainLayer.Entities
         public string? AppUserId { get; set; }
         public AppUser? AppUser { get; set; }
         public List<StadiumImage>? StadiumImages { get; set; }
+        public List<StadiumDiscount>? StadiumDiscounts { get; set; }
         public List<Area>? Areas { get; set; }
     }
 }
