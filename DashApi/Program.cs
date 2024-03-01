@@ -19,6 +19,7 @@ builder.Services.AddControllers();
 
 //EXTENSION     
 builder.Services.AddServices();
+builder.Services.AddValidation();
 
 builder.Services.AddFluentValidationAutoValidation();
 

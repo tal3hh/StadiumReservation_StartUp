@@ -16,6 +16,7 @@ builder.Services.AddControllers();
 
 //EXTRENSION
 builder.Services.AddServices();
+builder.Services.AddValidation();
 
 builder.Services.AddFluentValidationAutoValidation();
 

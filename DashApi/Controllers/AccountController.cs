@@ -47,7 +47,7 @@ namespace DashApi.Controllers
 
         #region Register
         [HttpPost("Register")]
-        public async Task<IActionResult> Register(CreateUserDto dto)
+        public async Task<IActionResult> Register(RegisterUserDto dto)
         {
             if (!ModelState.IsValid) return BadRequest(dto);
 

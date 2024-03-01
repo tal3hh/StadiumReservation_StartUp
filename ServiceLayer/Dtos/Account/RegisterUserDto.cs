@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ServiceLayer.Dtos.Account
 {
-    public class CreateUserDto
+    public class RegisterUserDto
     {
         public string? Fullname { get; set; }
         public string? Username { get; set; }

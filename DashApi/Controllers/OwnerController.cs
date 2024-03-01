@@ -72,9 +72,9 @@ namespace DashApi.Controllers
             }
             return BadRequest(dto);
         }
-        //ADD
+        //ADD   
         [HttpPost("Owner/Register")]
-        public async Task<IActionResult> Register(CreateUserDto dto)
+        public async Task<IActionResult> Register(RegisterUserDto dto)
         {
             if (!ModelState.IsValid) return BadRequest(dto);
 
