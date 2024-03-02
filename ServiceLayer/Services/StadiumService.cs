@@ -66,7 +66,7 @@ namespace ServiceLayer.Services
                 {
                     id = stadium.Id,
                     name = stadium.Name,
-                    path = stadium.StadiumImages?.FirstOrDefault(x => x.Main)?.Path,
+                    path = stadium.StadiumImages?.FirstOrDefault(x => x.Main)?.Path ?? null,
                     phoneNumber = stadium.PhoneNumber,
                     addres = stadium.Address,
                     minPrice = stadium.minPrice,

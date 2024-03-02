@@ -25,6 +25,5 @@ namespace WebApi.Controllers
 
             return Ok(list);
         }
-
     }
 }

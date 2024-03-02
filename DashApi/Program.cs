@@ -8,7 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using RepositoryLayer.Contexts;
 using ServiceLayer.AutoMapper;
 using ServiceLayer.Extensions;
-using System;
+using ServiceLayer.Utlities;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -123,6 +123,14 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+//TryCatch
+app.UseMiddleware<ExceptionMiddlewareHandler>();
+
+app.UseStaticFiles();
+app.UseRouting();
+
+app.UseResponseCaching();
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
