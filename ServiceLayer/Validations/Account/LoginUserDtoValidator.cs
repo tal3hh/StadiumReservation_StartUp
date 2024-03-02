@@ -15,7 +15,7 @@ namespace ServiceLayer.Validations
             RuleFor(dto => dto.UsernameorEmail)
                 .NotNull().WithMessage("İstifadəçi adı və ya e-poçt boş ola bilməz.")
                 .NotEmpty().WithMessage("İstifadəçi adı və ya e-poçt boş ola bilməz.")
-                .MaximumLength(200).WithMessage("İstifadəçi adı və ya e-poçt 200 simvoldan çox ola bilməz.");
+                .MaximumLength(400).WithMessage("İstifadəçi adı və ya e-poçt 400 simvoldan çox ola bilməz.");
 
             RuleFor(dto => dto.Password)
                 .NotEmpty().WithMessage("Şifrə boş ola bilməz.")

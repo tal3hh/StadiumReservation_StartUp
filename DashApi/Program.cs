@@ -54,15 +54,15 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddIdentity<AppUser, IdentityRole>(opt =>
 {
-    opt.Password.RequireNonAlphanumeric = false;  //Simvollardan biri olmalidir(@,/,$) 
-    opt.Password.RequireLowercase = false;       //Mutleq Kicik herf
-    opt.Password.RequireUppercase = false;       //Mutleq Boyuk herf 
-    opt.Password.RequiredLength = 4;            //Min. simvol sayi
-    opt.Password.RequireDigit = false;
+    opt.Password.RequireNonAlphanumeric = false;      //Simvollardan biri olmalidir(@,/,$) 
+    opt.Password.RequireLowercase = false;            //Mutleq Kicik herf
+    opt.Password.RequireUppercase = false;            //Mutleq Boyuk herf 
+    opt.Password.RequiredLength = 3;                  //Min. simvol sayi
+    opt.Password.RequireDigit = false; 
 
-    opt.User.RequireUniqueEmail = true;
+    opt.User.RequireUniqueEmail = true;               //Email Unikal olmalidir
 
-    opt.SignIn.RequireConfirmedEmail = false;
+    opt.SignIn.RequireConfirmedEmail = false;         //Email Tesdiqi olmalidir
     opt.SignIn.RequireConfirmedAccount = false;
 
     //opt.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(1); //Sifreni 5 defe sehv girdikde hesab 1dk baglanir.

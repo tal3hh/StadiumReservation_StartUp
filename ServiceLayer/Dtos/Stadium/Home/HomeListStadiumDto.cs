@@ -9,7 +9,7 @@ namespace ServiceLayer.Dtos.Stadium.Home
 {
     public class HomeListStadiumDto
     {
-        public int Id { get; set; }
+        public int id { get; set; }
         public string? name { get; set; }
         public string? path { get; set; }
         public decimal minPrice { get; set; }

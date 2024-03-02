@@ -7,7 +7,7 @@ namespace ServiceLayer.Validations
     {
         public CreateStadiumImageDtoValidator()
         {
-            RuleFor(dto => dto.s)
+            RuleFor(dto => dto.StadiumId)
                 .GreaterThan(0).WithMessage("Stadyum IDsi 0-dan böyük olmalıdır.");
 
             RuleFor(dto => dto.Path)

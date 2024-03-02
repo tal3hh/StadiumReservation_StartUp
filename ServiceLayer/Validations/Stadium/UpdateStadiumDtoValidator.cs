@@ -64,4 +64,5 @@ namespace ServiceLayer.Validations
                 .NotEmpty().WithMessage("Bağlanış vaxtı boş ola bilməz.")
                 .GreaterThan(dto => dto.OpenTime).WithMessage("Bağlanış vaxtı, açılış vaxtından böyük olmalıdır.");
         }
+    }
 }

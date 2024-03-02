@@ -64,7 +64,7 @@ namespace ServiceLayer.Services
 
                 return new HomeListStadiumDto
                 {
-                    Id = stadium.Id,
+                    id = stadium.Id,
                     name = stadium.Name,
                     path = stadium.StadiumImages?.FirstOrDefault(x => x.Main)?.Path,
                     phoneNumber = stadium.PhoneNumber,
@@ -273,47 +273,63 @@ namespace ServiceLayer.Services
 
         public async Task<Paginate<HomeListStadiumDto>> StadiumTimeFilterListPagineAsync(TimeFilterStadiumVM vm)
         {
-            if (vm.minPrice > vm.maxPrice)
-                (vm.minPrice, vm.maxPrice) = (vm.maxPrice, vm.minPrice);
-
             var query = _context.Stadiums
                 .AsNoTracking()
                 .Include(s => s.StadiumImages)
                 .Include(s => s.StadiumDiscounts)
                 .Include(s => s.Areas)
                 .ThenInclude(a => a.Reservations)
-                .Where(x => x.minPrice >= vm.minPrice && x.minPrice <= vm.maxPrice)
                 .AsQueryable();
+
+            //Price 
+            if (vm.minPrice > 0 || vm.maxPrice > 0)
+            {
+                if (vm.minPrice > vm.maxPrice)
+                    (vm.minPrice, vm.maxPrice) = (vm.maxPrice, vm.minPrice);
+
+                query = query.Where(x => x.minPrice >= vm.minPrice && x.minPrice <= vm.maxPrice);
+            }
 
             List<Stadium> stadiums = await query.ToListAsync();
 
+            //Date
             DateTime date = vm.Date.Date >= DateTime.Now.Date ? vm.Date.Date : DateTime.Now.Date;
 
-            List<HomeListStadiumDto> paginatedStadiums = stadiums
+            List<HomeListStadiumDto> stadiumList = stadiums
                 .Select(stadium =>
                 {
+                    //var reservedHours = stadium.Areas
+                    //    .SelectMany(a => a.Reservations)
+                    //    .Where(r =>
+                    //        r.Date.Date == date &&
+                    //        stadium.Areas.Any(a => a.Reservations.Any(x => x.Date.Hour == r.Date.Hour && x.Id != r.Id))
+                    //    )
+                    //    .Select(r => r.Date.Hour)
+                    //    .Distinct()
+                    //    .ToList();
 
                     var reservedHours = stadium.Areas
-                        .SelectMany(a => a.Reservations)
-                        .Where(r =>
-                            r.Date.Date == date &&
-                            r.Date < date.AddDays(1) &&
-                            stadium.Areas.Any(a => a.Reservations.Any(x => x.Date.Hour == r.Date.Hour && x.Id != r.Id))
-                        )
-                        .Select(r => r.Date.Hour)
-                        .Distinct()
-                        .ToList();
+                          .SelectMany(a => a.Reservations)
+                          .Where(r =>
+                              r.Date.Date == date &&
+                              stadium.Areas.Any(a => a.Reservations.Any(x => x.Date.Hour == r.Date.Hour && x.Id != r.Id))
+                          )
+                          .GroupBy(r => r.Date.Hour)
+                          .Where(grp => grp.Count() == stadium.Areas.Count)
+                          .Select(grp => grp.Key)
+                          .ToList();
 
-                    if (vm.startTime == vm.endTime)
-                        vm.endTime = vm.endTime + 1;
 
-                    if (vm.startTime > vm.endTime)
-                        (vm.startTime, vm.endTime) = (vm.endTime, vm.startTime);
-
+                    //TIME
                     if (date == DateTime.Now.Date)
                     {
                         vm.startTime = vm.startTime <= DateTime.Now.Hour ? DateTime.Now.Hour + 1 : vm.startTime;
-                        vm.endTime = vm.endTime >= 24 || vm.endTime < DateTime.Now.Hour ? 24 : vm.endTime;
+                        vm.endTime = vm.endTime > 24 || vm.endTime <= vm.startTime ? 24 : vm.endTime;
+                    }
+                    else
+                    {
+                        vm.startTime = vm.startTime < 0 || vm.startTime >= 24 ? 0 : vm.startTime;
+                        vm.endTime = vm.endTime > 24 || vm.endTime <= vm.startTime ? 24 : vm.endTime;
                     }
 
                     List<string> availableHourRanges = Enumerable.Range(vm.startTime, vm.endTime - vm.startTime)
@@ -324,6 +340,7 @@ namespace ServiceLayer.Services
 
                     return new HomeListStadiumDto
                     {
+                        id = stadium.Id,
                         name = stadium.Name,
                         path = stadium.StadiumImages?.FirstOrDefault(x => x.Main)?.Path,
                         phoneNumber = stadium.PhoneNumber,
@@ -337,7 +354,7 @@ namespace ServiceLayer.Services
                 .ToList();
 
             // Paginate
-            Paginate<HomeListStadiumDto> paginateResult = PaginateItems(paginatedStadiums, vm.page, vm.take);
+            Paginate<HomeListStadiumDto> paginateResult = PaginateItems(stadiumList, vm.page, vm.take);
 
             return paginateResult;
         }

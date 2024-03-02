@@ -76,7 +76,7 @@ namespace ServiceLayer.Services
         {
             Reservation? Reservation = await _context.Reservations.SingleOrDefaultAsync(x => x.Id == id);
 
-            if (Reservation is null)
+            if (Reservation != null)
             {
                 _context.Reservations.Remove(Reservation);
                 await _context.SaveChangesAsync();

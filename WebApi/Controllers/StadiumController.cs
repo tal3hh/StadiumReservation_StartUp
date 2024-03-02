@@ -57,6 +57,8 @@ namespace WebApi.Controllers
             return Ok(paginateDto);
         }
 
+
+
         //STADIUM DETALLARI SEHIFESI
         [HttpGet("stadiumDetail/{stadiumId}")]
         public async Task<IActionResult> StadiumDetail(int stadiumId)

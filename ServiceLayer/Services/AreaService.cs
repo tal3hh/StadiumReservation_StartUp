@@ -63,7 +63,7 @@ namespace ServiceLayer.Services
         {
             Area? Area = await _context.Areas.SingleOrDefaultAsync(x => x.Id == id);
 
-            if (Area is null)
+            if (Area != null)
             {
                 _context.Areas.Remove(Area);
                 await _context.SaveChangesAsync();
