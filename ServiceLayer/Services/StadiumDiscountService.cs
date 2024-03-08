@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using RepositoryLayer.Contexts;
 using ServiceLayer.Dtos.StadiumDiscount;
 using ServiceLayer.Services.Interface;
+using ServiceLayer.Utlities;
 
 namespace ServiceLayer.Services
 {
@@ -35,7 +36,7 @@ namespace ServiceLayer.Services
         public async Task CreateAsync(CreateStadiumDiscountDto dto)
         {
             StadiumDiscount StadiumDiscount = _mapper.Map<StadiumDiscount>(dto);
-            StadiumDiscount.CreateDate = DateTime.Now;
+            StadiumDiscount.CreateDate = DateTimeAz.Now;
             StadiumDiscount.IsActive = true;
 
             await _context.StadiumDiscounts.AddAsync(StadiumDiscount);

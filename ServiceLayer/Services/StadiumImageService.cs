@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using RepositoryLayer.Contexts;
 using ServiceLayer.Dtos.StadiumImage;
 using ServiceLayer.Services.Interface;
+using ServiceLayer.Utlities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,7 +41,7 @@ namespace ServiceLayer.Services
         public async Task CreateAsync(CreateStadiumImageDto dto)
         {
             StadiumImage StadiumImage = _mapper.Map<StadiumImage>(dto);
-            StadiumImage.CreateDate = DateTime.Now;
+            StadiumImage.CreateDate = DateTimeAz.Now;
             StadiumImage.IsActive = true;
 
             await _context.StadiumImages.AddAsync(StadiumImage);

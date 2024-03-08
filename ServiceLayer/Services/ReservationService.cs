@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using RepositoryLayer.Contexts;
 using ServiceLayer.Dtos.Reservation.Dash;
 using ServiceLayer.Services.Interface;
+using ServiceLayer.Utlities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -46,7 +47,7 @@ namespace ServiceLayer.Services
                 return false;   
 
             Reservation Reservation = _mapper.Map<Reservation>(dto);
-            Reservation.CreateDate = DateTime.Now;
+            Reservation.CreateDate = DateTimeAz.Now;
             Reservation.IsActive = true;
 
             await _context.Reservations.AddAsync(Reservation);

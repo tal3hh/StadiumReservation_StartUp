@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using RepositoryLayer.Contexts;
 using ServiceLayer.Dtos.Area.Dash;
 using ServiceLayer.Services.Interface;
+using ServiceLayer.Utlities;
 
 namespace ServiceLayer.Services
 {
@@ -35,7 +36,7 @@ namespace ServiceLayer.Services
         public async Task CreateAsync(CreateAreaDto dto)
         {
             Area Area = _mapper.Map<Area>(dto);
-            Area.CreateDate = DateTime.Now;
+            Area.CreateDate = DateTimeAz.Now;
             Area.IsActive = true;
 
             await _context.Areas.AddAsync(Area);

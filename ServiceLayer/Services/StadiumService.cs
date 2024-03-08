@@ -7,12 +7,6 @@ using ServiceLayer.Dtos.Stadium.Home;
 using ServiceLayer.Services.Interface;
 using ServiceLayer.Utlities;
 using ServiceLayer.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ServiceLayer.Services
 {
@@ -38,7 +32,7 @@ namespace ServiceLayer.Services
                 .OrderBy(x => x.minPrice)
                 .ToListAsync();
 
-            var now = DateTime.Now;
+            var now = DateTimeAz.Now;
             var today = now.Date;
             var nowHour = now.Hour + 1;
 
@@ -99,7 +93,7 @@ namespace ServiceLayer.Services
 
         public async Task<Paginate<HomeListStadiumDto>> StadiumListPagineAsync(StadiumPagineVM vm)
         {
-            var now = DateTime.Now;
+            var now = DateTimeAz.Now;
             var today = now.Date;
             var nowHour = now.Hour + 1;
 
@@ -134,6 +128,7 @@ namespace ServiceLayer.Services
 
                     return new HomeListStadiumDto
                     {
+                        id = stadium.Id,
                         name = stadium.Name,
                         path = stadium.StadiumImages?.FirstOrDefault(x => x.Main)?.Path,
                         phoneNumber = stadium.PhoneNumber,
@@ -154,7 +149,7 @@ namespace ServiceLayer.Services
 
         public async Task<Paginate<HomeListStadiumDto>> StadiumSearchListPagineAsync(SearchStadiumVM vm)
         {
-            var now = DateTime.Now;
+            var now = DateTimeAz.Now;
             var today = now.Date;
             var nowHour = now.Hour + 1;
 
@@ -190,6 +185,7 @@ namespace ServiceLayer.Services
 
                     return new HomeListStadiumDto
                     {
+                        id = stadium.Id,
                         name = stadium.Name,
                         phoneNumber = stadium.PhoneNumber,
                         addres = stadium.Address,
@@ -226,7 +222,7 @@ namespace ServiceLayer.Services
 
             var allStadiumsEmptyHours = await query.ToListAsync();
 
-            var now = DateTime.Now;
+            var now = DateTimeAz.Now;
             var today = now.Date;
             var nowHour = now.Hour + 1;
 
@@ -253,6 +249,7 @@ namespace ServiceLayer.Services
 
                     return new HomeListStadiumDto
                     {
+                        id = stadium.Id,
                         name = stadium.Name,
                         path = stadium.StadiumImages?.FirstOrDefault(x => x.Main)?.Path,
                         phoneNumber = stadium.PhoneNumber,
@@ -293,7 +290,7 @@ namespace ServiceLayer.Services
             List<Stadium> stadiums = await query.ToListAsync();
 
             //Date
-            DateTime date = vm.Date.Date >= DateTime.Now.Date ? vm.Date.Date : DateTime.Now.Date;
+            DateTime date = vm.Date.Date >= DateTimeAz.Now.Date ? vm.Date.Date : DateTimeAz.Now.Date;
 
             List<HomeListStadiumDto> stadiumList = stadiums
                 .Select(stadium =>
@@ -321,9 +318,9 @@ namespace ServiceLayer.Services
 
 
                     //TIME
-                    if (date == DateTime.Now.Date)
+                    if (date == DateTimeAz.Now.Date)
                     {
-                        vm.startTime = vm.startTime <= DateTime.Now.Hour ? DateTime.Now.Hour + 1 : vm.startTime;
+                        vm.startTime = vm.startTime <= DateTimeAz.Now.Hour ? DateTimeAz.Now.Hour + 1 : vm.startTime;
                         vm.endTime = vm.endTime > 24 || vm.endTime <= vm.startTime ? 24 : vm.endTime;
                     }
                     else
@@ -374,7 +371,7 @@ namespace ServiceLayer.Services
 
             if (stadium == null) return new HomeDetailStadiumDto();
 
-            var now = DateTime.Now;
+            var now = DateTimeAz.Now;
             var today = now.Date;
             var nowHour = now.Hour + 1;  //indiki saatda bir rezerv ola bilmez...
 
@@ -424,7 +421,7 @@ namespace ServiceLayer.Services
 
             if (stadium == null) return new HomeDetailStadiumDto();
 
-            if (vm.date.Date == DateTime.Today)
+            if (vm.date.Date == DateTimeAz.Today)
                 return await StadiumDetailAsync(vm.stadiumId);
 
             var reservedHours = stadium.Areas
@@ -491,7 +488,7 @@ namespace ServiceLayer.Services
         public async Task CreateAsync(CreateStadiumDto dto)
         {
             Stadium stadium = _mapper.Map<Stadium>(dto);
-            stadium.CreateDate = DateTime.Now;
+            stadium.CreateDate = DateTimeAz.Now;
             stadium.IsActive = true;
 
             await _context.Stadiums.AddAsync(stadium);

@@ -115,16 +115,22 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+//if (app.Environment.IsDevelopment())
+//{
+
+//}
+
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
+app.UseCors(x => x.AllowAnyOrigin()
+                  .AllowAnyMethod()
+                  .AllowAnyHeader());
+
 //TryCatch
-app.UseMiddleware<ExceptionMiddlewareHandler>();
+app.UseMiddleware<DashExceptionMiddleware>();
 
 app.UseStaticFiles();
 app.UseRouting();
