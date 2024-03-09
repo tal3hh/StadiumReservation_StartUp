@@ -12,7 +12,7 @@ namespace ServiceLayer.Services.Interface
     {
         Task<bool> RemoveAsync(int id);
         Task<bool> UpdateAsync(UpdateReservationDto dto);
-        Task<bool> CreateAsync(CreateReservationDto dto);
+        Task<int> CreateAsync(CreateReservationDto dto);
         Task<DashReservationDto> FindById(int id);
         Task<List<DashReservationDto>> AllAsync();
     }

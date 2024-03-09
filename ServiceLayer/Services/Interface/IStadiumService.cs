@@ -14,6 +14,7 @@ namespace ServiceLayer.Services.Interface
     {
         //Home
         Task<List<HomeListStadiumDto>> HomeStadiumOrderByListAsync();
+        Task<List<HomeListStadiumDto>> HomeStadiumCompanyListAsync();
 
 
         //Stadium List

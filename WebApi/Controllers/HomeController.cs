@@ -26,5 +26,13 @@ namespace WebApi.Controllers
 
             return Ok(list);
         }
+
+        [HttpGet("Home/all-stadiums/Company")]
+        public async Task<IActionResult> HomeAllCompanyStadiums()
+        {
+            var list = await _stadiumService.HomeStadiumCompanyListAsync();
+
+            return Ok(list);
+        }
     }
 }

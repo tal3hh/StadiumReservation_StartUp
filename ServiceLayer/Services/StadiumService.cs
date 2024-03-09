@@ -72,6 +72,58 @@ namespace ServiceLayer.Services
 
             return allStadiumsEmptyHours;
         }
+
+        public async Task<List<HomeListStadiumDto>> HomeStadiumCompanyListAsync()
+        {
+            List<Stadium>? stadiums = await _context.Stadiums
+                .AsNoTracking()
+                .Include(s => s.StadiumImages)
+                .Include(s => s.StadiumDiscounts)
+                .Include(s => s.Areas)
+                .ThenInclude(a => a.Reservations)
+                .Where(s => s.StadiumDiscounts.Any())  //Endirimi olan stadionlar
+                .ToListAsync();
+
+            var now = DateTimeAz.Now;
+            var today = now.Date;
+            var nowHour = now.Hour + 1;
+
+            var allStadiumsEmptyHours = stadiums.Select(stadium =>
+            {
+                List<int> reservedHours = stadium.Areas
+                    .SelectMany(a => a.Reservations)
+                    .Where(r =>
+                        r.Date.Date == today &&
+                        r.Date.Hour >= nowHour &&
+                        r.Date < today.AddDays(1) &&
+                        stadium.Areas.Any(a => a.Reservations.Any(x => x.Date.Hour == r.Date.Hour && x.Id != r.Id))
+                    )
+                    .Select(r => r.Date.Hour)
+                    .Distinct()
+                    .ToList();
+
+                List<string>? availableHourRanges = Enumerable.Range(nowHour, 24 - nowHour)
+                    .Except(reservedHours)
+                    .Select(h => $"{h:00}:00-{(h + 1):00}:00")
+                    .Take(3)
+                    .ToList();
+
+                return new HomeListStadiumDto
+                {
+                    id = stadium.Id,
+                    name = stadium.Name,
+                    path = stadium.StadiumImages?.FirstOrDefault(x => x.Main)?.Path ?? null,
+                    phoneNumber = stadium.PhoneNumber,
+                    addres = stadium.Address,
+                    minPrice = stadium.minPrice,
+                    maxPrice = stadium.maxPrice,
+                    discounts = stadium.StadiumDiscounts?.Select(d => d.Path).ToList() ?? new List<string>(),
+                    emptyDates = availableHourRanges
+                };
+            }).ToList();
+
+            return allStadiumsEmptyHours;
+        }
         #endregion
 
         #region Stadiums

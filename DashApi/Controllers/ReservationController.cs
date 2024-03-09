@@ -39,14 +39,17 @@ namespace DashApi.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(dto);
 
-            if (!await _reservationService.CreateAsync(dto))
+            if (await _reservationService.CreateAsync(dto) == 0)
                 return BadRequest($"{dto.Date.ToString("HH:00 | dd/MMMM/yyyy")} bu tarixde artiq rezerv olunub.");
+
+            if (await _reservationService.CreateAsync(dto) == 1)
+                return BadRequest("Keçmiş saat üçün rezerv oluna bilməz.");
 
             return Ok();
         }
 
         [HttpPut("upadteReservation")]
-        public async Task<IActionResult> addReservation(UpdateReservationDto dto)
+        public async Task<IActionResult> upadteReservation(UpdateReservationDto dto)
         {
             if (!ModelState.IsValid) return BadRequest(dto);
 

@@ -38,13 +38,18 @@ namespace ServiceLayer.Services
             return _mapper.Map<DashReservationDto>(entity);
         }
 
-        public async Task<bool> CreateAsync(CreateReservationDto dto)
+        public async Task<int> CreateAsync(CreateReservationDto dto)
         {
             if (await _context.Reservations.AnyAsync(x => x.Date.Hour == dto.Date.Hour &&
                                                        x.Date.Day == dto.Date.Day &&
                                                        x.Date.Year == dto.Date.Year &&
+                                                       x.Date.Month == dto.Date.Month &&
                                                        x.AreaId == dto.areaId))
-                return false;   
+                return 0;
+
+            if (dto.Date.Hour < DateTimeAz.Now.Hour &&
+                dto.Date.Date == DateTimeAz.Today)
+                return 1;
 
             Reservation Reservation = _mapper.Map<Reservation>(dto);
             Reservation.CreateDate = DateTimeAz.Now;
@@ -53,7 +58,7 @@ namespace ServiceLayer.Services
             await _context.Reservations.AddAsync(Reservation);
             await _context.SaveChangesAsync();
 
-            return true;
+            return 2;
         }
 
         public async Task<bool> UpdateAsync(UpdateReservationDto dto)
