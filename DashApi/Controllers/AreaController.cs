@@ -1,10 +1,4 @@
-﻿using AutoMapper;
-using DomainLayer.Entities;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using RepositoryLayer.Contexts;
-using RepositoryLayer.Migrations;
+﻿using Microsoft.AspNetCore.Mvc;
 using ServiceLayer.Dtos.Area.Dash;
 using ServiceLayer.Services.Interface;
 
@@ -27,10 +21,16 @@ namespace DashApi.Controllers
             return Ok(await _areaService.AllAsync());
         }
 
-        [HttpGet("Area/{id}")]
-        public async Task<IActionResult> Areas(int id)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Findareas(int id)
         {
             return Ok(await _areaService.FindById(id));
+        }
+
+        [HttpGet("Stadium/{stadiumId}")]
+        public async Task<IActionResult> StadiumAreas(int stadiumId)
+        {
+            return Ok(await _areaService.FindByStadiumId(stadiumId));
         }
 
         [HttpPost("addArea")]

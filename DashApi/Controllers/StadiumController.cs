@@ -16,12 +16,10 @@ namespace DashApi.Controllers
     [ApiController]
     public class StadiumController : ControllerBase
     {
-        private readonly UserManager<AppUser> _userManager;
         private readonly IStadiumService _stadiumService;
 
-        public StadiumController(UserManager<AppUser> userManager, IStadiumService stadiumService)
+        public StadiumController(IStadiumService stadiumService)
         {
-            _userManager = userManager;
             _stadiumService = stadiumService;
         }
 
@@ -42,10 +40,14 @@ namespace DashApi.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(dto);
 
-            var user = await _userManager.FindByIdAsync(dto.AppUserId);
-            if (user is null) return NotFound("Istifadeci tapilmadi.");
+            int result = await _stadiumService.CreateAsync(dto);
 
-            await _stadiumService.CreateAsync(dto);
+            if (result == 1) return NotFound("Istifadeci tapilmadi.");
+
+            if (result == 2) return BadRequest("Sahibkar kimi qeydiyyatda deyilsiniz.");
+
+            if (result == 3) return BadRequest("Bu sahibkarın adında artiq bir stadion var. " +
+                                                        "(Yeni bir istifadəçi yaradın)");
 
             return Ok();
         }

@@ -7,6 +7,7 @@ using ServiceLayer.Dtos.Account;
 using ServiceLayer.Dtos.Reservation.Dash;
 using ServiceLayer.Dtos.Reservation.Home;
 using ServiceLayer.Dtos.Stadium.Home;
+using ServiceLayer.Services;
 using ServiceLayer.Services.Interface;
 using ServiceLayer.ViewModels;
 
@@ -20,12 +21,14 @@ namespace DashApi.Controllers
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
         private readonly ITokenService _tokenService;
-        public OwnerController(AppDbContext context, UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, ITokenService tokenService)
+        private readonly IAreaService _areaService;
+        public OwnerController(AppDbContext context, UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, ITokenService tokenService, IAreaService areaService)
         {
             _context = context;
             _userManager = userManager;
             _signInManager = signInManager;
             _tokenService = tokenService;
+            _areaService = areaService;
         }
 
 
@@ -50,14 +53,15 @@ namespace DashApi.Controllers
             {
                 var roles = await _userManager.GetRolesAsync(user);
 
-                if (!roles.Contains("Owner")) return NotFound("Sahibkar deyilsiniz."); 
+                if (!roles.Contains("Owner")) return NotFound("Sahibkar kimi qeydiyyatda deyilsiniz."); 
 
                 TokenResponseDto? token = _tokenService.GenerateJwtToken(user.UserName, (List<string>)roles);
 
                 if (token == null) return BadRequest("Token is null");
 
                 var userStadium = await _context.Stadiums.Include(x=> x.AppUser).FirstOrDefaultAsync(x => x.AppUserId == user.Id);
-                if (userStadium == null) return NotFound("Bu istifadecinin stadiumu yoxdur.");
+
+                if (userStadium == null) return NotFound("Bu istifadəçinin stadionu yoxdur.");
 
                 var ownerDto = new OwnerDto
                 {
@@ -71,8 +75,8 @@ namespace DashApi.Controllers
                 return Ok(ownerDto);
             }
             return BadRequest(dto);
-        }
-        //ADD   
+        }   
+
         [HttpPost("Owner/Register")]
         public async Task<IActionResult> Register(RegisterUserDto dto)
         {
@@ -122,6 +126,13 @@ namespace DashApi.Controllers
         }
 
 
+        [HttpGet("Stadium/{stadiumId}")]
+        public async Task<IActionResult> StadiumAreas(int stadiumId)
+        {
+            return Ok(await _areaService.FindByStadiumId(stadiumId));
+        }
+
+
         // REZERVLER 
         [HttpGet("Reservations/AfterNow")]
         public async Task<IActionResult> GetFutureReservations(int stadiumId)
@@ -163,14 +174,14 @@ namespace DashApi.Controllers
             return Ok(stadiumDto);
         }
 
-        [HttpPost("Reservations/dateFilter-start-end/{stadiumId}")]
-        public async Task<IActionResult> StadiumDetailDate(int stadiumId, OwnerReservFilter vm)
+        [HttpPost("Reservations/dateFilter-start-end")]
+        public async Task<IActionResult> StadiumDetailDate(OwnerReservFilter vm)
         {
             Stadium? stadium = await _context.Stadiums
                         .AsNoTracking()
                         .Include(s => s.Areas)
                         .ThenInclude(a => a.Reservations)
-                        .FirstOrDefaultAsync(s => s.Id == stadiumId);
+                        .FirstOrDefaultAsync(s => s.Id == vm.stadiumId);
 
             if (stadium == null) return NotFound($"Stadium not found.");
 
@@ -187,7 +198,7 @@ namespace DashApi.Controllers
                     Price = r.Price,
                     areaName = r.Area.Name,
                     hour = $"{r.Date.ToString("HH:00")}-{r.Date.AddHours(1).ToString("HH:00")}",
-                    date = r.Date.ToString("dd/MMMM/yyyy")
+                    date = r.Date.ToString("dd/MM/yyyy")
                 })
                 .ToList();
 
@@ -214,7 +225,7 @@ namespace DashApi.Controllers
                 {
                     StadiumId = stadium.Id,
                     StadiumName = stadium.Name,
-                    Date = group.Key.ToString("dd/MMMM/yyyy"),
+                    Date = group.Key.ToString("dd/MM/yyyy"),
                     TotalPrice = group.Sum(r => r.Price)
                 })
                 .ToList();
@@ -222,15 +233,15 @@ namespace DashApi.Controllers
             return Ok(groupedReservations);
         }
 
-        [HttpPost("Reservations/OneDateFilter-Reservations")]
-        public async Task<IActionResult> StadiumDetailDateReserv(int stadiumId, DateTime date)
+        [HttpPost("Reservations/OneDateFilter")]
+        public async Task<IActionResult> StadiumDetailDateReserv(OwnerDateReserv vm)
         {
             List<Reservation> reservations = await _context.Reservations
                         .AsNoTracking()
                         .Include(x => x.Area)
                         .ThenInclude(x => x.Stadium)
-                        .Where(x => x.Date.Date == date.Date &&
-                                   x.Area.StadiumId == stadiumId)
+                        .Where(x => x.Date.Date == vm.Date.Date &&
+                                   x.Area.StadiumId == vm.stadiumId)
                         .OrderBy(x=> x.Date.Hour)
                         .ToListAsync();
 
@@ -244,7 +255,7 @@ namespace DashApi.Controllers
                     Price = reservation.Price,
                     phoneNumber = reservation.PhoneNumber,
                     areaName = reservation.Area.Name,
-                    date = reservation.Date.ToString("DD-MMMM-yyyy"),
+                    date = reservation.Date.ToString("dd/MM/yyyy"),
                     hour = $"{reservation.Date.ToString("HH:00")}-{reservation.Date.AddHours(1).ToString("HH:00")}",
                 };
 

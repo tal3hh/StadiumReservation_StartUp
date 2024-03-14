@@ -13,17 +13,16 @@ namespace ServiceLayer.Dtos.Stadium.Home
         public decimal price { get; set; }
         public string? addres { get; set; }
         public string? phoneNumber { get; set; }
-        public string? description { get; set; }
-        public int view { get; set; }
 
-        public string? OpenDay { get; set; }
-        public string? CloseDay { get; set; }
-        public DateTime OpenTime { get; set; }
-        public DateTime CloseTime { get; set; }
+        public string? openDay { get; set; }
+        public string? closeDay { get; set; }
+        public string? openTime { get; set; }
+        public string? closeTime { get; set; }
 
         public List<string>? emptyDates { get; set; }
+        public List<string>? descriptions { get; set; }
         public List<string>? discounts { get; set; }
 
-        public List<StadiumImageDto> stadiumImages { get; set; }
+        public List<StadiumImageDto>? stadiumImages { get; set; }
     }
 }

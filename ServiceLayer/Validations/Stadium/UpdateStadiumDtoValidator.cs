@@ -44,9 +44,6 @@ namespace ServiceLayer.Validations
                 .NotEmpty().WithMessage("Telefon nömrəsi boş ola bilməz.")
                 .NotNull().WithMessage("Telefon nömrəsi boş ola bilməz.");
 
-            RuleFor(dto => dto.Description)
-                .MaximumLength(800).WithMessage("Təsvir 800 simvoldan çox ola bilməz.");
-
             RuleFor(dto => dto.OpenDay)
                 .NotEmpty().WithMessage("Açılış günü boş ola bilməz.")
                 .NotNull().WithMessage("Açılış günü boş ola bilməz.");
@@ -61,8 +58,7 @@ namespace ServiceLayer.Validations
 
             RuleFor(dto => dto.CloseTime)
                 .NotNull().WithMessage("Bağlanış vaxtı boş ola bilməz.")
-                .NotEmpty().WithMessage("Bağlanış vaxtı boş ola bilməz.")
-                .GreaterThan(dto => dto.OpenTime).WithMessage("Bağlanış vaxtı, açılış vaxtından böyük olmalıdır.");
+                .NotEmpty().WithMessage("Bağlanış vaxtı boş ola bilməz.");
         }
     }
 }

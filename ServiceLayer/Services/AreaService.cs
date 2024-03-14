@@ -33,6 +33,14 @@ namespace ServiceLayer.Services
             return _mapper.Map<DashAreaDto>(entity);
         }
 
+        public async Task<List<DashAreaDto>> FindByStadiumId(int stadiumId)
+        {
+            var list = await _context.Areas.Include(x => x.Stadium)
+                                             .Where(x => x.StadiumId == stadiumId).ToListAsync();
+
+            return _mapper.Map<List<DashAreaDto>>(list);
+        }
+
         public async Task CreateAsync(CreateAreaDto dto)
         {
             Area Area = _mapper.Map<Area>(dto);

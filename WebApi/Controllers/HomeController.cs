@@ -13,7 +13,6 @@ namespace WebApi.Controllers
     public class HomeController : ControllerBase
     {
         private readonly IStadiumService _stadiumService;
-
         public HomeController(IStadiumService stadiumService)
         {
             _stadiumService = stadiumService;

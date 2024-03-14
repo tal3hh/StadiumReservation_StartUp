@@ -71,9 +71,10 @@ namespace WebApi.Controllers
         [HttpPost("stadiumDetail/dateFilter")]
         public async Task<IActionResult> StadiumDetailDate(StadiumDetailVM vm)
         {
-            var stadiumDetailDto = await _stadiumService.DateStadiumDetailAsync(vm);
+            if (vm.date.Date == DateTimeAz.Today)
+                return Ok(await _stadiumService.StadiumDetailAsync(vm.stadiumId));
 
-            return Ok(stadiumDetailDto);
+            return Ok(await _stadiumService.DateStadiumDetailAsync(vm));
         }
 
 

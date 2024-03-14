@@ -1,19 +1,12 @@
 ﻿using AutoMapper;
 using DomainLayer.Entities;
-using Microsoft.AspNetCore.Identity;
-using ServiceLayer.Dtos.Account;
 using ServiceLayer.Dtos.Area.Dash;
 using ServiceLayer.Dtos.Reservation.Dash;
-using ServiceLayer.Dtos.Stadium;
 using ServiceLayer.Dtos.Stadium.Dash;
 using ServiceLayer.Dtos.Stadium.Home;
+using ServiceLayer.Dtos.StadiumDetail;
 using ServiceLayer.Dtos.StadiumDiscount;
 using ServiceLayer.Dtos.StadiumImage;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ServiceLayer.AutoMapper
 {
@@ -28,8 +21,7 @@ namespace ServiceLayer.AutoMapper
             //Dash
             CreateMap<Stadium, CreateStadiumDto>().ReverseMap();
             CreateMap<Stadium, UpdateStadiumDto>().ReverseMap();
-            CreateMap<Stadium, DashStadiumDto>()
-                .ForMember(x => x.appuserName, y => y.MapFrom(z => z.AppUser.Fullname));
+            CreateMap<Stadium, DashStadiumDto>();
             CreateMap<DashStadiumDto, Stadium>();
 
 
@@ -53,6 +45,11 @@ namespace ServiceLayer.AutoMapper
             CreateMap<StadiumImage, CreateStadiumImageDto>().ReverseMap();
             CreateMap<StadiumImage, UpdateStadiumImageDto>().ReverseMap();
 
+            CreateMap<StadiumDetail, DashStadiumDetailDto>()
+                .ForMember(x => x.stadiumName, y => y.MapFrom(z => z.Stadium.Name));
+            CreateMap<DashStadiumDetailDto, StadiumDetail>();
+            CreateMap<StadiumDetail, CreateStadiumDetailDto>().ReverseMap();
+            CreateMap<StadiumDetail, UpdateStadiumDetailDto>().ReverseMap();
 
             CreateMap<StadiumDiscount, DashStadiumDiscountDto>()
                 .ForMember(x => x.stadiumName, y => y.MapFrom(z => z.Stadium.Name));

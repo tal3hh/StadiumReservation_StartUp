@@ -13,6 +13,7 @@ namespace ServiceLayer.Services.Interface
         Task<bool> UpdateAsync(UpdateAreaDto dto);
         Task CreateAsync(CreateAreaDto dto);
         Task<DashAreaDto> FindById(int id);
+        Task<List<DashAreaDto>> FindByStadiumId(int stadiumId);
         Task<List<DashAreaDto>> AllAsync();
     }
 }

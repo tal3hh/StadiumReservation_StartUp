@@ -20,7 +20,11 @@ namespace RepositoryLayer.Contexts
         {
             modelBuilder.Entity<Stadium>().HasOne(x => x.AppUser).WithOne(x => x.Stadium).HasForeignKey<Stadium>(x => x.AppUserId);
 
+            modelBuilder.Entity<TimeStadium>().HasOne(x => x.Stadium).WithOne(x => x.TimeStadium).HasForeignKey<TimeStadium>(x => x.StadiumId);
+
             modelBuilder.Entity<Reservation>().HasOne(x => x.Area).WithMany(x => x.Reservations).HasForeignKey(x => x.AreaId);
+
+            modelBuilder.Entity<StadiumDetail>().HasOne(x => x.Stadium).WithMany(x => x.StadiumDetails).HasForeignKey(x => x.StadiumId);
 
             modelBuilder.Entity<StadiumImage>().HasOne(x => x.Stadium).WithMany(x => x.StadiumImages).HasForeignKey(x => x.StadiumId);
 
@@ -33,6 +37,8 @@ namespace RepositoryLayer.Contexts
 
         public DbSet<Stadium> Stadiums { get; set; }
         public DbSet<StadiumImage> StadiumImages { get; set; }
+        public DbSet<StadiumDetail> StadiumDetails { get; set; }
+        public DbSet<TimeStadium> TimeStadiums { get; set; }
         public DbSet<StadiumDiscount> StadiumDiscounts { get; set; }
         public DbSet<Area> Areas { get; set; }
         public DbSet<Reservation> Reservations { get; set; }

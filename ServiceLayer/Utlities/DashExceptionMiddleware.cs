@@ -22,11 +22,11 @@ namespace ServiceLayer.Utlities
             {
                 await _next.Invoke(httpContext);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 httpContext.Response.StatusCode = 500;
                 httpContext.Response.ContentType = "text/plain";
-                await httpContext.Response.WriteAsync("Servisce bir hata olustu");
+                await httpContext.Response.WriteAsync("Servisdə bir xəta baş verdi. \nError: " + ex.Message);
             }
         }
     }
