@@ -18,7 +18,8 @@ namespace WebApi.Controllers
             _stadiumService = stadiumService;
         }
 
-        [HttpGet("Home/all-stadiums/orderPrice")]
+
+        [HttpGet("Stadium-orderPrice")]
         public async Task<IActionResult> HomeAllOrderStadiums()
         {
             var list = await _stadiumService.HomeStadiumOrderByListAsync();
@@ -26,7 +27,7 @@ namespace WebApi.Controllers
             return Ok(list);
         }
 
-        [HttpGet("Home/all-stadiums/Company")]
+        [HttpGet("Stadium-Discount")]
         public async Task<IActionResult> HomeAllCompanyStadiums()
         {
             var list = await _stadiumService.HomeStadiumCompanyListAsync();

@@ -9,6 +9,7 @@ using ServiceLayer.Dtos.Stadium.Home;
 using ServiceLayer.Services.Interface;
 using ServiceLayer.Utlities;
 using ServiceLayer.ViewModels;
+using System.Diagnostics;
 
 namespace ServiceLayer.Services
 {
@@ -24,113 +25,6 @@ namespace ServiceLayer.Services
             _userManager = userManager;
         }
 
-        #region Home
-        public async Task<List<HomeListStadiumDto>> HomeStadiumOrderByListAsync()
-        {
-            List<Stadium>? stadiums = await _context.Stadiums
-                .AsNoTracking()
-                .Include(s => s.StadiumImages)
-                .Include(s => s.StadiumDiscounts)
-                .Include(s => s.Areas)
-                .ThenInclude(a => a.Reservations)
-                .OrderBy(x => x.minPrice)
-                .ToListAsync();
-
-            var now = DateTimeAz.Now;
-            var today = now.Date;
-            var nowHour = now.Hour + 1;
-
-            var allStadiumsEmptyHours = stadiums.Select(stadium =>
-            {
-                List<int> reservedHours = stadium.Areas
-                    .SelectMany(a => a.Reservations)
-                    .Where(r =>
-                        r.Date.Date == today &&
-                        r.Date.Hour >= nowHour &&
-                        r.Date < today.AddDays(1) &&
-                        stadium.Areas.Any(a => a.Reservations.Any(x => x.Date.Hour == r.Date.Hour && x.Id != r.Id))
-                    )
-                    .Select(r => r.Date.Hour)
-                    .Distinct()
-                    .ToList();
-
-                List<string>? availableHourRanges = Enumerable.Range(nowHour, 24 - nowHour)
-                    .Except(reservedHours)
-                    .Select(h => $"{h:00}:00-{(h + 1):00}:00")
-                    .Take(3)
-                    .ToList();
-
-                return new HomeListStadiumDto
-                {
-                    id = stadium.Id,
-                    name = stadium.Name,
-                    path = stadium.StadiumImages?.FirstOrDefault(x => x.Main)?.Path ?? null,
-                    phoneNumber = stadium.PhoneNumber,
-                    addres = stadium.Address,
-                    minPrice = stadium.minPrice,
-                    maxPrice = stadium.maxPrice,
-                    discounts = stadium.StadiumDiscounts?.Select(d => d.Path).ToList() ?? new List<string>(),
-                    emptyDates = availableHourRanges
-                };
-            }).ToList();
-
-            return allStadiumsEmptyHours;
-        }
-
-        public async Task<List<HomeListStadiumDto>> HomeStadiumCompanyListAsync()
-        {
-            List<Stadium>? stadiums = await _context.Stadiums
-                .AsNoTracking()
-                .Include(s => s.StadiumImages)
-                .Include(s => s.StadiumDiscounts)
-                .Include(s => s.Areas)
-                .ThenInclude(a => a.Reservations)
-                .Where(s => s.StadiumDiscounts.Any())  //Endirimi olan stadionlar
-                .ToListAsync();
-
-            var now = DateTimeAz.Now;
-            var today = now.Date;
-            var nowHour = now.Hour + 1;
-
-            var allStadiumsEmptyHours = stadiums.Select(stadium =>
-            {
-                List<int> reservedHours = stadium.Areas
-                    .SelectMany(a => a.Reservations)
-                    .Where(r =>
-                        r.Date.Date == today &&
-                        r.Date.Hour >= nowHour &&
-                        r.Date < today.AddDays(1) &&
-                        stadium.Areas.Any(a => a.Reservations.Any(x => x.Date.Hour == r.Date.Hour && x.Id != r.Id))
-                    )
-                    .Select(r => r.Date.Hour)
-                    .Distinct()
-                    .ToList();
-
-                List<string>? availableHourRanges = Enumerable.Range(nowHour, 24 - nowHour)
-                    .Except(reservedHours)
-                    .Select(h => $"{h:00}:00-{(h + 1):00}:00")
-                    .Take(3)
-                    .ToList();
-
-                return new HomeListStadiumDto
-                {
-                    id = stadium.Id,
-                    name = stadium.Name,
-                    path = stadium.StadiumImages?.FirstOrDefault(x => x.Main)?.Path ?? null,
-                    phoneNumber = stadium.PhoneNumber,
-                    addres = stadium.Address,
-                    minPrice = stadium.minPrice,
-                    maxPrice = stadium.maxPrice,
-                    discounts = stadium.StadiumDiscounts?.Select(d => d.Path).ToList() ?? new List<string>(),
-                    emptyDates = availableHourRanges
-                };
-            }).ToList();
-
-            return allStadiumsEmptyHours;
-        }
-        #endregion
-
-        #region Stadiums
         private Paginate<T> PaginateItems<T>(List<T> list, int page, int take)
         {
             take = take > 0 ? take : 10;
@@ -147,69 +41,109 @@ namespace ServiceLayer.Services
             return new Paginate<T>(paginatedResult, currentPage, totalPages);
         }
 
-        public async Task<Paginate<HomeListStadiumDto>> StadiumListPagineAsync(StadiumPagineVM vm)
+        private Task<List<HomeListStadiumDto>> TodayEmptyHourStadiums(List<Stadium> stadiums)
         {
-            var now = DateTimeAz.Now;
-            var today = now.Date;
-            var nowHour = now.Hour + 1;
+            var today = DateTimeAz.Now.Date;
+            var nowHour = DateTimeAz.Now.Hour + 1;
 
-            var allStadiumsEmptyHours = await _context.Stadiums
+            var allStadiumsEmptyHours = stadiums.Select(stadium =>
+            {
+                List<int> reservedHours = stadium.Areas
+                    .SelectMany(a => a.Reservations)
+                    .Where(r =>
+                        r.Date.Date == today &&
+                        r.Date.Hour >= nowHour &&
+
+                        stadium.Areas.All(a =>
+                            a.Reservations != null && a.Reservations.Any(x =>
+                                                                         x.Date.Hour == r.Date.Hour
+
+                            )
+                        )
+                    )
+                    .Select(r => r.Date.Hour)
+                    .Distinct()
+                    .ToList();
+
+                List<string>? availableHourRanges = Enumerable.Range(nowHour, 24 - nowHour)
+                    .Except(reservedHours)
+                    .Select(h => $"{h:00}:00-{(h + 1):00}:00")
+                    .Take(3)
+                    .ToList();
+
+                return new HomeListStadiumDto
+                {
+                    id = stadium.Id,
+                    name = stadium.Name,
+                    path = stadium.StadiumImages?.FirstOrDefault(x => x.Main)?.Path ?? null,
+                    phoneNumber = stadium.PhoneNumber,
+                    addres = stadium.Address,
+                    minPrice = stadium.minPrice,
+                    maxPrice = stadium.maxPrice,
+                    discounts = stadium.StadiumDiscounts?.Select(d => d.Path).ToList() ?? new List<string?>(),
+                    emptyDates = availableHourRanges
+                };
+            }).ToList();
+
+            return Task.FromResult(allStadiumsEmptyHours);
+        }
+
+
+        #region Home
+
+        public async Task<List<HomeListStadiumDto>> HomeStadiumOrderByListAsync()
+        {
+            List<Stadium>? stadiums = await _context.Stadiums
                 .AsNoTracking()
                 .Include(s => s.StadiumImages)
                 .Include(s => s.StadiumDiscounts)
                 .Include(s => s.Areas)
                 .ThenInclude(a => a.Reservations)
+                .OrderBy(x => x.minPrice)
                 .ToListAsync();
 
-            var paginatedStadiums = allStadiumsEmptyHours
-                .Select(stadium =>
-                {
-                    var reservedHours = stadium.Areas
-                        .SelectMany(a => a.Reservations)
-                        .Where(r =>
-                            r.Date.Date == today &&
-                            r.Date.Hour >= nowHour &&
-                            r.Date < today.AddDays(1) &&
-                            stadium.Areas.Any(a => a.Reservations.Any(x => x.Date.Hour == r.Date.Hour && x.Id != r.Id))
-                        )
-                        .Select(r => r.Date.Hour)
-                        .Distinct()
-                        .ToList();
+            return await TodayEmptyHourStadiums(stadiums);
+        }
 
-                    var availableHourRanges = Enumerable.Range(nowHour, 24 - nowHour)
-                        .Except(reservedHours)
-                        .Select(h => $"{h:00}:00-{(h + 1):00}:00")
-                        .Take(3)
-                        .ToList();
+        public async Task<List<HomeListStadiumDto>> HomeStadiumCompanyListAsync()
+        {
+            List<Stadium>? stadiums = await _context.Stadiums
+                .AsNoTracking()
+                .Include(s => s.StadiumImages)
+                .Include(s => s.StadiumDiscounts)
+                .Include(s => s.Areas)
+                .ThenInclude(a => a.Reservations)
+                .Where(s => s.StadiumDiscounts.Any())  //Endirimi olan stadionlar
+                .ToListAsync();
 
-                    return new HomeListStadiumDto
-                    {
-                        id = stadium.Id,
-                        name = stadium.Name,
-                        path = stadium.StadiumImages?.FirstOrDefault(x => x.Main)?.Path,
-                        phoneNumber = stadium.PhoneNumber,
-                        addres = stadium.Address,
-                        minPrice = stadium.minPrice,
-                        maxPrice = stadium.maxPrice,
-                        discounts = stadium.StadiumDiscounts?.Select(d => d.Path).ToList() ?? new List<string>(),
-                        emptyDates = availableHourRanges
-                    };
-                })
-                .ToList();
+            return await TodayEmptyHourStadiums(stadiums);
+        }
+
+        #endregion
+
+
+        #region Stadiums
+        public async Task<Paginate<HomeListStadiumDto>> StadiumListPagineAsync(StadiumPagineVM vm)
+        {
+            List<Stadium> stadiums = await _context.Stadiums
+                .AsNoTracking()
+                .Include(s => s.StadiumImages)
+                .Include(s => s.StadiumDiscounts)
+                .Include(s => s.Areas)
+                .ThenInclude(a => a.Reservations)   
+                .ToListAsync();
+
+            List<HomeListStadiumDto> emptyHourStadiums = await TodayEmptyHourStadiums(stadiums);
 
             // Paginate
-            var paginateResult = PaginateItems(paginatedStadiums, vm.page, vm.take);
+            var paginateResult = PaginateItems(emptyHourStadiums, vm.page, vm.take);
 
             return paginateResult;
         }
 
         public async Task<Paginate<HomeListStadiumDto>> StadiumSearchListPagineAsync(SearchStadiumVM vm)
         {
-            var now = DateTimeAz.Now;
-            var today = now.Date;
-            var nowHour = now.Hour + 1;
-
-            var allStadiumsEmptyHours = await _context.Stadiums
+            List<Stadium> stadiums = await _context.Stadiums
                 .AsNoTracking()
                 .Include(s => s.StadiumImages)
                 .Include(s => s.StadiumDiscounts)
@@ -218,43 +152,10 @@ namespace ServiceLayer.Services
                 .Where(x => x.Name.Contains(vm.search.Trim()))
                 .ToListAsync();
 
-            var paginatedStadiums = allStadiumsEmptyHours
-                .Select(stadium =>
-                {
-                    var reservedHours = stadium.Areas
-                        .SelectMany(a => a.Reservations)
-                        .Where(r =>
-                            r.Date.Date == today &&
-                            r.Date.Hour >= nowHour &&
-                            r.Date < today.AddDays(1) &&
-                            stadium.Areas.Any(a => a.Reservations.Any(x => x.Date.Hour == r.Date.Hour && x.Id != r.Id))
-                        )
-                        .Select(r => r.Date.Hour)
-                        .Distinct()
-                        .ToList();
-
-                    var availableHourRanges = Enumerable.Range(nowHour, 24 - nowHour)
-                        .Except(reservedHours)
-                        .Select(h => $"{h:00}:00-{(h + 1):00}:00")
-                        .Take(3)
-                        .ToList();
-
-                    return new HomeListStadiumDto
-                    {
-                        id = stadium.Id,
-                        name = stadium.Name,
-                        phoneNumber = stadium.PhoneNumber,
-                        addres = stadium.Address,
-                        minPrice = stadium.minPrice,
-                        maxPrice = stadium.maxPrice,
-                        discounts = stadium.StadiumDiscounts?.Select(d => d.Path).ToList() ?? new List<string>(),
-                        emptyDates = availableHourRanges
-                    };
-                })
-                .ToList();
+            List<HomeListStadiumDto> emptyHourStadiums = await TodayEmptyHourStadiums(stadiums);
 
             // Paginate
-            var paginateResult = PaginateItems(paginatedStadiums, vm.page, vm.take);
+            var paginateResult = PaginateItems(emptyHourStadiums, vm.page, vm.take);
 
             return paginateResult;
         }
@@ -276,50 +177,10 @@ namespace ServiceLayer.Services
             if (!string.IsNullOrEmpty(vm.City))
                 query = query.Where(x => x.City.Contains(vm.City));
 
-            var allStadiumsEmptyHours = await query.ToListAsync();
-
-            var now = DateTimeAz.Now;
-            var today = now.Date;
-            var nowHour = now.Hour + 1;
-
-            var paginatedStadiums = allStadiumsEmptyHours
-                .Select(stadium =>
-                {
-                    var reservedHours = stadium.Areas
-                        .SelectMany(a => a.Reservations)
-                        .Where(r =>
-                            r.Date.Date == today &&
-                            r.Date.Hour >= nowHour &&
-                            r.Date < today.AddDays(1) &&
-                            stadium.Areas.Any(a => a.Reservations.Any(x => x.Date.Hour == r.Date.Hour && x.Id != r.Id))
-                        )
-                        .Select(r => r.Date.Hour)
-                        .Distinct()
-                        .ToList();
-
-                    var availableHourRanges = Enumerable.Range(nowHour, 24 - nowHour)
-                        .Except(reservedHours)
-                        .Select(h => $"{h:00}:00-{(h + 1):00}:00")
-                        .Take(3)
-                        .ToList();
-
-                    return new HomeListStadiumDto
-                    {
-                        id = stadium.Id,
-                        name = stadium.Name,
-                        path = stadium.StadiumImages?.FirstOrDefault(x => x.Main)?.Path,
-                        phoneNumber = stadium.PhoneNumber,
-                        addres = stadium.Address,
-                        minPrice = stadium.minPrice,
-                        maxPrice = stadium.maxPrice,
-                        discounts = stadium.StadiumDiscounts?.Select(d => d.Path).ToList() ?? new List<string>(),
-                        emptyDates = availableHourRanges
-                    };
-                })
-                .ToList();
+            List<HomeListStadiumDto> emptyHourStadiums = await TodayEmptyHourStadiums(await query.ToListAsync());
 
             // Paginate
-            var paginateResult = PaginateItems(paginatedStadiums, vm.page, vm.take);
+            var paginateResult = PaginateItems(emptyHourStadiums, vm.page, vm.take);
 
             return paginateResult;
         }
@@ -345,38 +206,34 @@ namespace ServiceLayer.Services
 
             List<Stadium> stadiums = await query.ToListAsync();
 
+            var now = DateTimeAz.Now;
             //Date
-            DateTime date = vm.Date.Date >= DateTimeAz.Now.Date ? vm.Date.Date : DateTimeAz.Now.Date;
+            DateTime date = vm.Date.Date >= now.Date ? vm.Date.Date : now.Date;
 
             List<HomeListStadiumDto> stadiumList = stadiums
                 .Select(stadium =>
                 {
-                    //var reservedHours = stadium.Areas
-                    //    .SelectMany(a => a.Reservations)
-                    //    .Where(r =>
-                    //        r.Date.Date == date &&
-                    //        stadium.Areas.Any(a => a.Reservations.Any(x => x.Date.Hour == r.Date.Hour && x.Id != r.Id))
-                    //    )
-                    //    .Select(r => r.Date.Hour)
-                    //    .Distinct()
-                    //    .ToList();
-
                     var reservedHours = stadium.Areas
                           .SelectMany(a => a.Reservations)
                           .Where(r =>
                               r.Date.Date == date &&
-                              stadium.Areas.Any(a => a.Reservations.Any(x => x.Date.Hour == r.Date.Hour && x.Id != r.Id))
+                              stadium.Areas.All(a =>
+                            a.Reservations != null &&
+                            a.Reservations.Any(x =>
+                                x.Date.Hour == r.Date.Hour
+                            )
+                        )
                           )
                           .GroupBy(r => r.Date.Hour)
                           .Where(grp => grp.Count() == stadium.Areas.Count)
                           .Select(grp => grp.Key)
                           .ToList();
 
-
+                    
                     //TIME
-                    if (date == DateTimeAz.Now.Date)
+                    if (date == now.Date)
                     {
-                        vm.startTime = vm.startTime <= DateTimeAz.Now.Hour ? DateTimeAz.Now.Hour + 1 : vm.startTime;
+                        vm.startTime = vm.startTime <= now.Hour ? now.Hour + 1 : vm.startTime;
                         vm.endTime = vm.endTime > 24 || vm.endTime <= vm.startTime ? 24 : vm.endTime;
                     }
                     else
@@ -400,7 +257,7 @@ namespace ServiceLayer.Services
                         addres = stadium.Address,
                         minPrice = stadium.minPrice,
                         maxPrice = stadium.maxPrice,
-                        discounts = stadium.StadiumDiscounts?.Select(d => d.Path).ToList() ?? new List<string>(),
+                        discounts = stadium.StadiumDiscounts?.Select(d => d.Path).ToList() ?? new List<string?>(),
                         emptyDates = availableHourRanges
                     };
                 })
@@ -413,6 +270,7 @@ namespace ServiceLayer.Services
         }
 
         #endregion
+
 
         #region Details
         public async Task<HomeDetailStadiumDto> StadiumDetailAsync(int stadiumId)
@@ -428,9 +286,8 @@ namespace ServiceLayer.Services
 
             if (stadium == null) return new HomeDetailStadiumDto();
 
-            var now = DateTimeAz.Now;
-            var today = now.Date;
-            var nowHour = now.Hour + 1;  //indiki saatda bir rezerv ola bilmez...
+            var today = DateTimeAz.Now.Date;
+            var nowHour = DateTimeAz.Now.Hour + 1;  //indiki saatda bir rezerv ola bilmez...
 
             var reservedHours = stadium.Areas
                 .SelectMany(a => a.Reservations)
@@ -438,7 +295,12 @@ namespace ServiceLayer.Services
                     r.Date.Date == today &&
                     r.Date.Hour >= nowHour &&
                     r.Date < today.AddDays(1) &&
-                    stadium.Areas.Any(a => a.Reservations.Any(ar => ar.Date.Hour == r.Date.Hour && ar.Id != r.Id))
+                    stadium.Areas.All(a =>
+                            a.Reservations != null &&
+                            a.Reservations.Any(x =>
+                                x.Date.Hour == r.Date.Hour
+                            )
+                        )
                 )
                 .GroupBy(r => r.Date.Hour)
                 .Where(grp => grp.Count() == stadium.Areas.Count)
@@ -455,10 +317,14 @@ namespace ServiceLayer.Services
                 name = stadium.Name,
                 phoneNumber = stadium.PhoneNumber,
                 addres = stadium.Address,
+                openDay = stadium.openDay,
+                closeDay = stadium.closeDay,
+                openTime = stadium.openTime,
+                closeTime = stadium.closeTime,
                 price = stadium.minPrice,
                 emptyDates = availableHourRanges,
-                descriptions = stadium.StadiumDetails?.Select(x => x.Description).ToList() ?? new List<string>(),
-                discounts = stadium.StadiumDiscounts?.Select(d => d.Path).ToList() ?? new List<string>(),
+                descriptions = stadium.StadiumDetails?.Select(x => x.Description).ToList() ?? new List<string?>(),
+                discounts = stadium.StadiumDiscounts?.Select(d => d.Path).ToList() ?? new List<string?>(),
                 stadiumImages = stadium.StadiumImages?.Select(i => new StadiumImageDto { path = i.Path, main = i.Main }).ToList() ?? new List<StadiumImageDto>()
             };
 
@@ -494,17 +360,6 @@ namespace ServiceLayer.Services
                 .Select(grp => grp.Key)
                 .ToList();
 
-            //var reservedHours = stadium.Areas
-            //    .SelectMany(a => a.Reservations)
-            //    .Where(r =>
-            //        r.Date.Date == date.Date &&
-            //        r.Date < date.Date.AddDays(1) &&
-            //        stadium.Areas.Any(a => a.Reservations.Any(ar => ar.Date.Hour == r.Date.Hour && ar.Id != r.Id))
-            //    )
-            //    .Select(r => r.Date.Hour)
-            //    .Distinct()
-            //    .ToList();
-
             //SAAT araligi
             var availableHourRanges = new List<string>();
 
@@ -522,7 +377,7 @@ namespace ServiceLayer.Services
             {
                 availableHourRanges = Enumerable.Range(0, 24)
                 .Except(reservedHours)
-                .Where(h => (h >= 0 && h < time.nightTime) || (h >= time.openTime && h <= time.closeTime)) 
+                .Where(h => (h >= 0 && h < time.nightTime) || (h >= time.openTime && h <= time.closeTime))
                 .Select(h => $"{h:00}:00-{(h + 1):00}:00")
                 .ToList();
             }
@@ -533,20 +388,25 @@ namespace ServiceLayer.Services
                 name = stadium.Name,
                 phoneNumber = stadium.PhoneNumber,
                 addres = stadium.Address,
+                openDay = stadium.openDay,
+                closeDay = stadium.closeDay,
+                openTime = stadium.openTime,
+                closeTime = stadium.closeTime,
                 price = stadium.minPrice,
                 emptyDates = availableHourRanges,
-                descriptions = stadium.StadiumDetails?.Select(x => x.Description).ToList() ?? new List<string>(),
-                discounts = stadium.StadiumDiscounts?.Select(d => d.Path).ToList() ?? new List<string>(),
+                descriptions = stadium.StadiumDetails?.Select(x => x.Description).ToList() ?? new List<string?>(),
+                discounts = stadium.StadiumDiscounts?.Select(d => d.Path).ToList() ?? new List<string?>(),
                 stadiumImages = stadium.StadiumImages?.Select(i => new StadiumImageDto { path = i.Path, main = i.Main }).ToList() ?? new List<StadiumImageDto>()
             };
             return homeDetailStadiumDto;
         }
         #endregion
 
+
         #region Dash
         public async Task<List<DashStadiumDto>> AllAsync()
         {
-            List<Stadium>? list = await _context.Stadiums.Include(x => x.AppUser).Include(x=> x.StadiumDetails)
+            List<Stadium>? list = await _context.Stadiums.Include(x => x.AppUser).Include(x => x.StadiumDetails)
                 .ToListAsync();
 
             return _mapper.Map<List<DashStadiumDto>>(list);

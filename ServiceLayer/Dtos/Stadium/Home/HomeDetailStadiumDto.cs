@@ -20,8 +20,8 @@ namespace ServiceLayer.Dtos.Stadium.Home
         public string? closeTime { get; set; }
 
         public List<string>? emptyDates { get; set; }
-        public List<string>? descriptions { get; set; }
-        public List<string>? discounts { get; set; }
+        public List<string?>? descriptions { get; set; }
+        public List<string?>? discounts { get; set; }
 
         public List<StadiumImageDto>? stadiumImages { get; set; }
     }

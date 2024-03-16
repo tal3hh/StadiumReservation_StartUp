@@ -17,6 +17,6 @@ namespace ServiceLayer.Dtos.Stadium.Home
         public string? addres { get; set; }
         public string? phoneNumber { get; set; }
         public List<string>? emptyDates { get; set; }
-        public List<string>? discounts { get; set; }
+        public List<string?>? discounts { get; set; }
     }
 }

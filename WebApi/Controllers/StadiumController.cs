@@ -25,7 +25,7 @@ namespace WebApi.Controllers
 
 
         //STADIONLAR LIST
-        [HttpPost("all-stadiums/Pagine")]
+        [HttpPost("Pagine")]
         public async Task<IActionResult> GetPagineStadiumsAsync(StadiumPagineVM vm)
         {
             var pagineDto = await _stadiumService.StadiumListPagineAsync(vm);
@@ -33,7 +33,7 @@ namespace WebApi.Controllers
             return Ok(pagineDto);
         }
 
-        [HttpPost("all-stadiums/Search/Pagine")]
+        [HttpPost("Pagine-Search")]
         public async Task<IActionResult> GetSearchPagineStadiumsAsync(SearchStadiumVM vm)
         {
             var paginateDto = await _stadiumService.StadiumSearchListPagineAsync(vm);
@@ -41,7 +41,7 @@ namespace WebApi.Controllers
             return Ok(paginateDto);
         }
 
-        [HttpPost("all-stadiums/Filter/Pagine")]
+        [HttpPost("Pagine-Filter")]
         public async Task<IActionResult> GetFilterPagineStadiumsAsync(FilterStadiumVM vm)
         {
             var paginateDto = await _stadiumService.StadiumFilterListPagineAsync(vm);
@@ -49,7 +49,7 @@ namespace WebApi.Controllers
             return Ok(paginateDto);
         }
 
-        [HttpPost("all-stadiums/Filter-Time/Pagine")]
+        [HttpPost("Pagine-Filter-Time")]
         public async Task<IActionResult> GetFilterTimePagineStadiumsAsync(TimeFilterStadiumVM vm)
         {
             var paginateDto = await _stadiumService.StadiumTimeFilterListPagineAsync(vm);
@@ -57,105 +57,5 @@ namespace WebApi.Controllers
             return Ok(paginateDto);
         }
 
-
-
-        //STADIUM DETALLARI SEHIFESI
-        [HttpGet("stadiumDetail/{stadiumId}")]
-        public async Task<IActionResult> StadiumDetail(int stadiumId)
-        {
-            var stadiumDetailDto = await _stadiumService.StadiumDetailAsync(stadiumId);
-
-            return Ok(stadiumDetailDto);
-        }
-
-        [HttpPost("stadiumDetail/dateFilter")]
-        public async Task<IActionResult> StadiumDetailDate(StadiumDetailVM vm)
-        {
-            if (vm.date.Date == DateTimeAz.Today)
-                return Ok(await _stadiumService.StadiumDetailAsync(vm.stadiumId));
-
-            return Ok(await _stadiumService.DateStadiumDetailAsync(vm));
-        }
-
-
-        //[HttpPost("all-stadiums/Filter2/Pagine")]
-        //public async Task<IActionResult> GetFilterPagineStadiumsAsync2(FilterStadiumVM vm)
-        //{
-        //    //VALIDATION
-        //    // 1. startDate indiki >= vaxtdan sonra olmalidir.
-        //    // 2. startDate endDate 3-5 gunden cox kecmesin.
-        //    // (Cunki normalda stadion sahibleride cox sonraya almazlar)
-        //    // 3. startDate endDate'den boyuk olsa yerleri deyissin.
-
-
-
-
-
-        //    if (vm.startDate > vm.endDate)
-        //        (vm.startDate, vm.endDate) = (vm.endDate, vm.startDate);
-
-        //    var query = _context.Stadiums
-        //        .AsNoTracking()
-        //        .Include(s => s.StadiumImages)
-        //        .Include(s => s.Areas)
-        //        .ThenInclude(a => a.Reservations)
-        //        .AsQueryable();
-
-        //    if (!string.IsNullOrEmpty(vm.City))
-        //        query.Where(x => x.City.Contains(vm.City));
-
-        //    if (vm.minPrice != 0 || vm.maxPrice != 0)
-        //    {
-        //        if (vm.minPrice > vm.maxPrice)
-        //            (vm.minPrice, vm.maxPrice) = (vm.maxPrice, vm.minPrice);
-
-        //        query.Where(x => x.minPrice >= vm.minPrice && x.minPrice <= vm.maxPrice);
-        //    }
-
-        //    var stadium = await query.ToListAsync();
-
-        //    if (vm.startDate.Date >= DateTime.Now.Date &&
-        //        vm.startDate.Date <= DateTime.Now.AddDays(5) &&
-        //        vm.endDate.Date <= DateTime.Now.AddDays(5))
-        //    {
-        //        var paginatedStadiums = stadium
-        //       .Select(x =>
-        //       {
-        //           var reservedHours = x.Areas
-        //               .SelectMany(a => a.Reservations)
-        //               .Where(r =>
-        //                   r.Date.Date >= vm.startDate.Date &&
-        //                   r.Date.Hour >= vm.startDate.Date.Hour &&
-        //                   r.Date <= vm.endDate.Date &&
-        //                   x.Areas.Any(a => a.Reservations.Any(x => x.Date.Hour == r.Date.Hour && x.Id != r.Id))
-        //               )
-        //               .Select(r => r.Date.Hour)
-        //               .Distinct()
-        //               .ToList();
-
-        //           var availableHourRanges = Enumerable.Range(0, 24 - 0)
-        //               .Except(reservedHours)
-        //               .Select(h => $"{h:00}:00-{(h + 1):00}:00")
-        //               .Take(3)
-        //               .ToList();
-
-        //           return new HomeListStadiumDto
-        //           {
-        //               name = x.Name,
-        //               path = x.StadiumImages?.FirstOrDefault(x => x.Main)?.Path,
-        //               phoneNumber = x.PhoneNumber,
-        //               addres = x.Address,
-        //               minPrice = x.minPrice,
-        //               maxPrice = x.maxPrice,
-        //               emptyDates = availableHourRanges
-        //           };
-        //       })
-        //       .ToList();
-
-        //        return Ok(paginatedStadiums);
-        //    }
-
-        //    return BadRequest();
-        //}
     }
 }

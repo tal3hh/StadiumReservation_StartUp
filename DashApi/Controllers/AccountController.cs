@@ -155,6 +155,24 @@ namespace DashApi.Controllers
             return Ok(userDtos);
         }
 
+        //LIST
+        [HttpGet("Owners")]
+        public async Task<IActionResult> GetOwners()
+        {
+            var ownerUsers = await _userManager.GetUsersInRoleAsync("Owner");
+
+            List<UserDto> userDtos = ownerUsers.Select(user => new UserDto
+            {
+                Fullname = user.Fullname,
+                Username = user.UserName,
+                Email = user.Email,
+                Phone = user.PhoneNumber,
+                CreateDate = user.CreateDate
+            }).ToList();
+
+            return Ok(userDtos);
+        }
+
         [HttpGet("Roles")]
         public async Task<IActionResult> GetRoles()
         {
