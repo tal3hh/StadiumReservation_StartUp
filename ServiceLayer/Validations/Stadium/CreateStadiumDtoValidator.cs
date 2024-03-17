@@ -41,21 +41,13 @@ namespace ServiceLayer.Validations
                 .NotEmpty().WithMessage("Telefon nömrəsi boş ola bilməz.")
                 .NotNull().WithMessage("Telefon nömrəsi boş ola bilməz.");
 
-            RuleFor(dto => dto.OpenDay)
-                .NotEmpty().WithMessage("Açılış günü boş ola bilməz.")
-                .NotNull().WithMessage("Açılış günü boş ola bilməz.");
+            RuleFor(dto => dto.OpenCloseDay)
+                .NotEmpty().WithMessage("Açılış-Bağlanış günü boş ola bilməz.")
+                .NotNull().WithMessage("Açılış-Bağlanış günü boş ola bilməz.");
 
-            RuleFor(dto => dto.CloseDay)
-                .NotEmpty().WithMessage("Bağlanış günü boş ola bilməz.")
-                .NotNull().WithMessage("Bağlanış günü boş ola bilməz.");
-
-            RuleFor(dto => dto.OpenTime)
-                .NotNull().WithMessage("Açılış vaxtı boş ola bilməz.")
-                .NotEmpty().WithMessage("Açılış vaxtı boş ola bilməz.");
-
-            RuleFor(dto => dto.CloseTime)
-                .NotNull().WithMessage("Bağlanış vaxtı boş ola bilməz.")
-                .NotEmpty().WithMessage("Bağlanış vaxtı boş ola bilməz.");
+            RuleFor(dto => dto.OpenCloseHour)
+                .NotNull().WithMessage("Açılış-Bağlanış vaxtı boş ola bilməz.")
+                .NotEmpty().WithMessage("Açılış-Bağlanış vaxtı boş ola bilməz.");
         }
     }
 }

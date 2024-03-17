@@ -9,7 +9,7 @@ namespace ServiceLayer.Dtos.Stadium.Dash
     public class UpdateStadiumDto
     {
         public int Id { get; set; }
-        public string? AppUserId { get; set; }
+        public string? Username { get; set; }
         public string? Name { get; set; }
         public string? City { get; set; }
         public decimal minPrice { get; set; }
@@ -17,10 +17,11 @@ namespace ServiceLayer.Dtos.Stadium.Dash
         public string? Address { get; set; }
         public string? PhoneNumber { get; set; }
 
+        public int openHour { get; set; }
+        public int closeHour { get; set; }
+        public int nightHour { get; set; }
 
-        public string? OpenDay { get; set; }
-        public string? CloseDay { get; set; }
-        public string? OpenTime { get; set; }
-        public string? CloseTime { get; set; }
+        public string? OpenCloseDay { get; set; }
+        public string? OpenCloseHour { get; set; }
     }
 }

@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore.Migrations.Operations;
 using RepositoryLayer.Contexts;
 using ServiceLayer.Dtos.Stadium.Dash;
 using ServiceLayer.Services.Interface;
+using ServiceLayer.Utlities;
 
 namespace DashApi.Controllers
 {
@@ -29,45 +30,54 @@ namespace DashApi.Controllers
             return Ok(await _stadiumService.AllAsync());
         }
 
-        [HttpGet("Stadium/{id}")]
+        [HttpGet("{id}")]
         public async Task<IActionResult> FindBy(int id)
         {
             return Ok(await _stadiumService.FindById(id));
         }
 
-        [HttpPost("addStadium")]
+        [HttpPost("create")]
         public async Task<IActionResult> addStadium(CreateStadiumDto dto)
         {
             if (!ModelState.IsValid) return BadRequest(dto);
 
-            int result = await _stadiumService.CreateAsync(dto);
+            var result = await _stadiumService.CreateAsync(dto);
 
-            if (result == 1) return NotFound("Istifadeci tapilmadi.");
+            if (result.RespType == RespType.Success) return Ok(result.Message);
 
-            if (result == 2) return BadRequest("Sahibkar kimi qeydiyyatda deyilsiniz.");
+            else if (result.RespType == RespType.BadReqest) return BadRequest(result.Message);
 
-            if (result == 3) return BadRequest("Bu sahibkarın adında artiq bir stadion var. " +
-                                                        "(Yeni bir istifadəçi yaradın)");
+            else if (result.RespType == RespType.NotFound) return NotFound(result.Message);
 
-            return Ok();
+            return BadRequest("Xəta baş verdi.");
         }
 
-        [HttpPut("upadteStadium")]
+        [HttpPut("update")]
         public async Task<IActionResult> upadteStadium(UpdateStadiumDto dto)
         {
             if (!ModelState.IsValid) return BadRequest(dto);
 
-            await _stadiumService.UpdateAsync(dto);
+            var result = await _stadiumService.UpdateAsync(dto);
 
-            return Ok();
+            if (result.RespType == RespType.Success) return Ok(result.Message);
+
+            else if (result.RespType == RespType.BadReqest) return BadRequest(result.Message);
+
+            else if (result.RespType == RespType.NotFound) return NotFound(result.Message);
+
+            return BadRequest("Xəta baş verdi.");
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> removeStadium(int id)
         {
-            await _stadiumService.RemoveAsync(id);
+            var result = await _stadiumService.RemoveAsync(id);
 
-            return Ok();
+            if (result.RespType == RespType.Success) return Ok(result.Message);
+
+            else if (result.RespType == RespType.NotFound) return NotFound(result.Message);
+
+            return BadRequest("Xəta baş verdi.");
         }
     }
 }

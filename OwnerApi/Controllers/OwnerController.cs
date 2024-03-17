@@ -8,6 +8,7 @@ using ServiceLayer.Dtos.Reservation.Dash;
 using ServiceLayer.Dtos.Reservation.Home;
 using ServiceLayer.Dtos.Stadium.Home;
 using ServiceLayer.Services.Interface;
+using ServiceLayer.Utlities;
 using ServiceLayer.ViewModels;
 
 namespace OwnerApi.Controllers
@@ -38,16 +39,39 @@ namespace OwnerApi.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(dto);
 
-            int result = await _reservationService.CreateAsync(dto);
-            
-            if (result == 0)
-                return BadRequest($"{dto.Date.ToString("HH:00 | dd/MMMM/yyyy")} bu tarixde artiq rezerv olunub.");
+            var result = await _reservationService.CreateAsync(dto);
 
-            if (result == 1)
-                return BadRequest("Keçmiş saat üçün rezerv oluna bilməz.");
+            if (result.RespType == RespType.Success)
+                return Ok(result.Message);
 
-            return Ok();
+            else if (result.RespType == RespType.BadReqest)
+                return BadRequest(result.Message);
+
+            else if (result.RespType == RespType.NotFound)
+                return NotFound(result.Message);
+
+            return BadRequest("Xəta baş verdi.");
         }
+
+        [HttpPut("updateReservation")]
+        public async Task<IActionResult> upadteReservation(UpdateReservationDto dto)
+        {
+            if (!ModelState.IsValid) return BadRequest(dto);
+
+            var result = await _reservationService.UpdateAsync(dto);
+
+            if (result.RespType == RespType.Success)
+                return Ok(result.Message);
+
+            else if (result.RespType == RespType.BadReqest)
+                return BadRequest(result.Message);
+
+            else if (result.RespType == RespType.NotFound)
+                return NotFound(result.Message);
+
+            return BadRequest("Xəta baş verdi.");
+        }
+
 
         // REZERVLER 
         [HttpGet("Reservations/AfterNow")]

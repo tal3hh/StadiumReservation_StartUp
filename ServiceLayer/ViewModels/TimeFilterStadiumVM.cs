@@ -10,6 +10,8 @@ namespace ServiceLayer.ViewModels
     {
         public DateTime Date { get; set; }
 
+        public string? Address { get; set; }
+
         public int startTime { get; set; }
         public int endTime { get; set; }
 

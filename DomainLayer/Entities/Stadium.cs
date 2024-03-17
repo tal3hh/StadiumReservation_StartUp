@@ -15,19 +15,19 @@ namespace DomainLayer.Entities
         public string? Address { get; set; }
         public string? City { get; set; }
 
+        public int openHour { get; set; }
+        public int closeHour { get; set; }
+        public int nightHour { get; set; }
 
-        public string? openDay { get; set; }
-        public string? closeDay { get; set; }
-        public string? openTime { get; set; }
-        public string? closeTime { get; set; }
+        public string? OpenCloseDay { get; set; }
+        public string? OpenCloseHour { get; set; }
 
 
         public string? AppUserId { get; set; }
         public AppUser? AppUser { get; set; }
-        public TimeStadium? TimeStadium { get; set; }
+        public List<Area>? Areas { get; set; }
         public List<StadiumImage>? StadiumImages { get; set; }
         public List<StadiumDetail>? StadiumDetails { get; set; }
         public List<StadiumDiscount>? StadiumDiscounts { get; set; }
-        public List<Area>? Areas { get; set; }
     }
 }

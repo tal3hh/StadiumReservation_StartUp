@@ -20,8 +20,12 @@ namespace ServiceLayer.AutoMapper
 
             //Dash
             CreateMap<Stadium, CreateStadiumDto>().ReverseMap();
-            CreateMap<Stadium, UpdateStadiumDto>().ReverseMap();
-            CreateMap<Stadium, DashStadiumDto>();
+            CreateMap<Stadium, UpdateStadiumDto>()
+                .ForMember(x => x.Username, y => y.MapFrom(z => z.AppUser.UserName));
+            CreateMap<UpdateStadiumDto, Stadium>();
+
+            CreateMap<Stadium, DashStadiumDto>()
+                .ForMember(x => x.Username, y => y.MapFrom(z => z.AppUser.UserName));
             CreateMap<DashStadiumDto, Stadium>();
 
 

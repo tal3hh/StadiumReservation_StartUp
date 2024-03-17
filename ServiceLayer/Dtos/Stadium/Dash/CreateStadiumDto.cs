@@ -15,11 +15,12 @@ namespace ServiceLayer.Dtos.Stadium.Dash
         public decimal maxPrice { get; set; }
         public string? Address { get; set; }
         public string? PhoneNumber { get; set; }
- 
 
-        public string? OpenDay { get; set; }
-        public string? CloseDay { get; set; }
-        public string? OpenTime { get; set; }
-        public string? CloseTime { get; set; }
+        public int openHour { get; set; }
+        public int closeHour { get; set; }
+        public int nightHour { get; set; }
+
+        public string? OpenCloseDay { get; set; }
+        public string? OpenCloseHour { get; set; }
     }
 }

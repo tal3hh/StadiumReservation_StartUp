@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ServiceLayer.Dtos.Area.Dash;
 using ServiceLayer.Services.Interface;
+using ServiceLayer.Utlities;
 
 namespace DashApi.Controllers
 {
@@ -15,6 +16,8 @@ namespace DashApi.Controllers
             _areaService = areaService;
         }
 
+
+
         [HttpGet("Areas")]
         public async Task<IActionResult> Areas()
         {
@@ -22,7 +25,7 @@ namespace DashApi.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> Findareas(int id)
+        public async Task<IActionResult> FindByArea(int id)
         {
             return Ok(await _areaService.FindById(id));
         }
@@ -33,30 +36,45 @@ namespace DashApi.Controllers
             return Ok(await _areaService.FindByStadiumId(stadiumId));
         }
 
-        [HttpPost("addArea")]
+        [HttpPost("create")]
         public async Task<IActionResult> addArea(CreateAreaDto dto)
         {
             if (!ModelState.IsValid) return BadRequest(dto);
 
-            await _areaService.CreateAsync(dto);
+            var result = await _areaService.UpdateAsync(dto);
 
-            return Ok();
+            if (result.RespType == RespType.NotFound)
+                return NotFound(result.Message);
+
+            else if (result.RespType == RespType.Success)
+                return Ok(result.Message);
+
+            else if (result.RespType == RespType.BadReqest)
+                return BadRequest(result.Message);
+
+            return BadRequest("Xəta baş verdi.");
         }
 
-        [HttpPut("upadteArea")]
+        [HttpPut("update")]
         public async Task<IActionResult> addArea(UpdateAreaDto dto)
         {
             if (!ModelState.IsValid) return BadRequest(dto);
 
-            if (!await _areaService.UpdateAsync(dto)) return NotFound();
+            var result = await _areaService.UpdateAsync(dto);
+            if (result.RespType == RespType.NotFound)
+                return NotFound(result.Message);
 
-            return Ok();
+            else if (result.RespType == RespType.Success)
+                return Ok(result.Message);
+           
+            return BadRequest("Xəta baş verdi.");
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> removeArea(int id)
         {
-            if (!await _areaService.RemoveAsync(id)) return NotFound();
+            if (!await _areaService.RemoveAsync(id)) 
+                return NotFound("Area tapılmadı.");
 
             return Ok();
         }

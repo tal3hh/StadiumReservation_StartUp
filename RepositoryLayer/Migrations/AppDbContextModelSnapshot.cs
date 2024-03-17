@@ -188,14 +188,17 @@ namespace RepositoryLayer.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("OpenCloseDay")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OpenCloseHour")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("closeDay")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("closeTime")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("closeHour")
+                        .HasColumnType("int");
 
                     b.Property<decimal>("maxPrice")
                         .HasColumnType("decimal(18,2)");
@@ -203,11 +206,11 @@ namespace RepositoryLayer.Migrations
                     b.Property<decimal>("minPrice")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("openDay")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("nightHour")
+                        .HasColumnType("int");
 
-                    b.Property<string>("openTime")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("openHour")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -300,40 +303,6 @@ namespace RepositoryLayer.Migrations
                     b.HasIndex("StadiumId");
 
                     b.ToTable("StadiumImages");
-                });
-
-            modelBuilder.Entity("DomainLayer.Entities.TimeStadium", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreateDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("StadiumId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("closeTime")
-                        .HasColumnType("int");
-
-                    b.Property<int>("nightTime")
-                        .HasColumnType("int");
-
-                    b.Property<int>("openTime")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("StadiumId")
-                        .IsUnique();
-
-                    b.ToTable("TimeStadiums");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -533,17 +502,6 @@ namespace RepositoryLayer.Migrations
                     b.Navigation("Stadium");
                 });
 
-            modelBuilder.Entity("DomainLayer.Entities.TimeStadium", b =>
-                {
-                    b.HasOne("DomainLayer.Entities.Stadium", "Stadium")
-                        .WithOne("TimeStadium")
-                        .HasForeignKey("DomainLayer.Entities.TimeStadium", "StadiumId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Stadium");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -614,8 +572,6 @@ namespace RepositoryLayer.Migrations
                     b.Navigation("StadiumDiscounts");
 
                     b.Navigation("StadiumImages");
-
-                    b.Navigation("TimeStadium");
                 });
 #pragma warning restore 612, 618
         }

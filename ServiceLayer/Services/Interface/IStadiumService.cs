@@ -30,10 +30,10 @@ namespace ServiceLayer.Services.Interface
 
 
         //Dash
-        Task RemoveAsync(int id);
-        Task UpdateAsync(UpdateStadiumDto dto);
-        Task<int> CreateAsync(CreateStadiumDto dto);
-        Task<DashStadiumDto> FindById(int id);
+        Task<IResponse> RemoveAsync(int id);
+        Task<IResponse> UpdateAsync(UpdateStadiumDto dto);
+        Task<IResponse> CreateAsync(CreateStadiumDto dto);
+        Task<UpdateStadiumDto> FindById(int id);
         Task<List<DashStadiumDto>> AllAsync();
     }
 }

@@ -10,14 +10,13 @@ namespace ServiceLayer.Dtos.Stadium.Home
     public class HomeDetailStadiumDto
     {
         public string? name { get; set; }
-        public decimal price { get; set; }
+        public decimal minPrice { get; set; }
+        public decimal maxPrice { get; set; }
         public string? addres { get; set; }
         public string? phoneNumber { get; set; }
 
-        public string? openDay { get; set; }
-        public string? closeDay { get; set; }
-        public string? openTime { get; set; }
-        public string? closeTime { get; set; }
+        public string? OpenCloseDay { get; set; }
+        public string? OpenCloseHour { get; set; }
 
         public List<string>? emptyDates { get; set; }
         public List<string?>? descriptions { get; set; }

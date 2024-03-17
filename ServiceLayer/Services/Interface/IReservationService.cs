@@ -1,19 +1,14 @@
-﻿using ServiceLayer.Dtos.Area.Dash;
-using ServiceLayer.Dtos.Reservation.Dash;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using ServiceLayer.Dtos.Reservation.Dash;
+using ServiceLayer.Utlities;
 
 namespace ServiceLayer.Services.Interface
 {
     public interface IReservationService
     {
-        Task<bool> RemoveAsync(int id);
-        Task<bool> UpdateAsync(UpdateReservationDto dto);
-        Task<int> CreateAsync(CreateReservationDto dto);
-        Task<DashReservationDto> FindById(int id);
+        Task<IResponse> RemoveAsync(int id);
+        Task<IResponse> UpdateAsync(UpdateReservationDto dto);
+        Task<IResponse> CreateAsync(CreateReservationDto dto);
+        Task<UpdateReservationDto> FindById(int id);
         Task<List<DashReservationDto>> AllAsync();
     }
 }

@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using RepositoryLayer.Contexts;
 using ServiceLayer.Dtos.Reservation.Dash;
 using ServiceLayer.Services.Interface;
+using ServiceLayer.Utlities;
 
 namespace DashApi.Controllers
 {
@@ -14,13 +15,13 @@ namespace DashApi.Controllers
     public class ReservationController : ControllerBase
     {
         private readonly IReservationService _reservationService;
-        private readonly AppDbContext _context;
 
-        public ReservationController(IReservationService reservationService, AppDbContext context)
+        public ReservationController(IReservationService reservationService)
         {
             _reservationService = reservationService;
-            _context = context;
         }
+
+
 
         [HttpGet("Reservations")]
         public async Task<IActionResult> Reservations()
@@ -28,44 +29,62 @@ namespace DashApi.Controllers
             return Ok(await _reservationService.AllAsync());
         }
 
-        [HttpGet("Reservations/{id}")]
+        [HttpGet("{id}")]
         public async Task<IActionResult> FindReservations(int id)
         {
             return Ok(await _reservationService.FindById(id));
         }
 
-        [HttpPost("addReservation")]
+        [HttpPost("create")]
         public async Task<IActionResult> addReservation(CreateReservationDto dto)
         {
             if (!ModelState.IsValid) return BadRequest(dto);
 
-            if (await _reservationService.CreateAsync(dto) == 0)
-                return BadRequest($"{dto.Date.ToString("HH:00 | dd/MMMM/yyyy")} bu tarixde artiq rezerv olunub.");
+            var result = await _reservationService.CreateAsync(dto);
 
-            if (await _reservationService.CreateAsync(dto) == 1)
-                return BadRequest("Keçmiş saat üçün rezerv oluna bilməz.");
+            if (result.RespType == RespType.Success)
+                return Ok(result.Message);
 
-            return Ok();
+            else if (result.RespType == RespType.BadReqest)
+                return BadRequest(result.Message);
+
+            else if (result.RespType == RespType.NotFound)
+                return NotFound(result.Message);
+
+            return BadRequest("Xəta baş verdi.");
         }
 
-        [HttpPut("upadteReservation")]
+        [HttpPut("update")]
         public async Task<IActionResult> upadteReservation(UpdateReservationDto dto)
         {
             if (!ModelState.IsValid) return BadRequest(dto);
 
-            if (await _reservationService.UpdateAsync(dto))
-                return NotFound();
+            var result = await _reservationService.UpdateAsync(dto);
 
-            return Ok();
+            if (result.RespType == RespType.Success)
+                return Ok(result.Message);
+
+            else if (result.RespType == RespType.BadReqest)
+                return BadRequest(result.Message);
+
+            else if (result.RespType == RespType.NotFound)
+                return NotFound(result.Message);
+
+            return BadRequest("Xəta baş verdi.");
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> removeReservation(int id)
         {
-            if (await _reservationService.RemoveAsync(id))
-                return NotFound();
+            var result = await _reservationService.RemoveAsync(id);
 
-            return Ok();
+            if (result.RespType == RespType.Success)
+                return Ok(result.Message);
+
+            else if (result.RespType == RespType.NotFound)
+                return BadRequest(result.Message);
+
+            return BadRequest("Xəta baş verdi.");
         }
     }
 }
