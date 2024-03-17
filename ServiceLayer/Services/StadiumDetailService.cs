@@ -38,18 +38,26 @@ namespace ServiceLayer.Services
             return _mapper.Map<DashStadiumDetailDto>(entity);
         }
 
-        public async Task CreateAsync(CreateStadiumDetailDto dto)
+        public async Task<IResponse> CreateAsync(CreateStadiumDetailDto dto)
         {
+            if (!await _context.Stadiums.AnyAsync(x => x.Id == dto.StadiumId))
+                return new Response(RespType.NotFound, "Stadion tapılmadı.");
+
             StadiumDetail StadiumDetail = _mapper.Map<StadiumDetail>(dto);
             StadiumDetail.CreateDate = DateTimeAz.Now;
             StadiumDetail.IsActive = true;
 
             await _context.StadiumDetails.AddAsync(StadiumDetail);
             await _context.SaveChangesAsync();
+
+            return new Response(RespType.Success, "Stadion detalı əlavə edildi.");
         }
 
-        public async Task<bool> UpdateAsync(UpdateStadiumDetailDto dto)
+        public async Task<IResponse> UpdateAsync(UpdateStadiumDetailDto dto)
         {
+            if (!await _context.Stadiums.AnyAsync(x => x.Id == dto.StadiumId))
+                return new Response(RespType.NotFound, "Stadion tapılmadı.");
+
             StadiumDetail? DBStadiumDetail = await _context.StadiumDetails.SingleOrDefaultAsync(x => x.Id == dto.Id);
 
             if (DBStadiumDetail != null)
@@ -59,12 +67,12 @@ namespace ServiceLayer.Services
                 _context.Entry(DBStadiumDetail).CurrentValues.SetValues(StadiumDetail);
 
                 await _context.SaveChangesAsync();
-                return true;
+                return new Response(RespType.Success, "Stadion detalı dəyişildi.");
             }
-            return false;
+            return new Response(RespType.BadReqest, "Stadion detalı tapılmadı.");
         }
 
-        public async Task<bool> RemoveAsync(int id)
+        public async Task<IResponse> RemoveAsync(int id)
         {
             StadiumDetail? StadiumDetail = await _context.StadiumDetails.SingleOrDefaultAsync(x => x.Id == id);
 
@@ -73,9 +81,9 @@ namespace ServiceLayer.Services
                 _context.StadiumDetails.Remove(StadiumDetail);
                 await _context.SaveChangesAsync();
 
-                return true;
+                return new Response(RespType.Success, "Stadion detalı dəyişildi.");
             }
-            return false;
+            return new Response(RespType.BadReqest, "Stadion detalı tapılmadı.");
         }
     }
 }

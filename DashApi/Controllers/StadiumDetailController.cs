@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ServiceLayer.Dtos.StadiumDetail;
+using ServiceLayer.Services;
 using ServiceLayer.Services.Interface;
+using ServiceLayer.Utlities;
 
 namespace DashApi.Controllers
 {
@@ -33,9 +35,18 @@ namespace DashApi.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(dto);
 
-            await _stadiumDetailService.CreateAsync(dto);
+            var result = await _stadiumDetailService.CreateAsync(dto);
 
-            return Ok();
+            if (result.RespType == RespType.NotFound)
+                return NotFound(result.Message);
+
+            else if (result.RespType == RespType.Success)
+                return Ok(result.Message);
+
+            else if (result.RespType == RespType.BadReqest)
+                return BadRequest(result.Message);
+
+            return BadRequest("Xəta baş verdi.");
         }
 
         [HttpPut("upadte")]
@@ -43,17 +54,35 @@ namespace DashApi.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(dto);
 
-            if (!await _stadiumDetailService.UpdateAsync(dto)) return NotFound();
+            var result = await _stadiumDetailService.UpdateAsync(dto);
 
-            return Ok();
+            if (result.RespType == RespType.NotFound)
+                return NotFound(result.Message);
+
+            else if (result.RespType == RespType.Success)
+                return Ok(result.Message);
+
+            else if (result.RespType == RespType.BadReqest)
+                return BadRequest(result.Message);
+
+            return BadRequest("Xəta baş verdi.");
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> removeStadiumDetail(int id)
         {
-            if (!await _stadiumDetailService.RemoveAsync(id)) return NotFound();
+            var result = await _stadiumDetailService.RemoveAsync(id);
 
-            return Ok();
+            if (result.RespType == RespType.NotFound)
+                return NotFound(result.Message);
+
+            else if (result.RespType == RespType.Success)
+                return Ok(result.Message);
+
+            else if (result.RespType == RespType.BadReqest)
+                return BadRequest(result.Message);
+
+            return BadRequest("Xəta baş verdi.");
         }
     }
 }

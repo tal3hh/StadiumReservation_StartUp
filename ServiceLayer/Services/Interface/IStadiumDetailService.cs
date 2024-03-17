@@ -1,4 +1,5 @@
 ﻿using ServiceLayer.Dtos.StadiumDetail;
+using ServiceLayer.Utlities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,9 +10,9 @@ namespace ServiceLayer.Services.Interface
 {
     public interface IStadiumDetailService
     {
-        Task<bool> RemoveAsync(int id);
-        Task<bool> UpdateAsync(UpdateStadiumDetailDto dto);
-        Task CreateAsync(CreateStadiumDetailDto dto);
+        Task<IResponse> RemoveAsync(int id);
+        Task<IResponse> UpdateAsync(UpdateStadiumDetailDto dto);
+        Task<IResponse> CreateAsync(CreateStadiumDetailDto dto);
         Task<DashStadiumDetailDto> FindById(int id);
         Task<List<DashStadiumDetailDto>> AllAsync();
     }

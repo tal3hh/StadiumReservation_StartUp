@@ -1,5 +1,6 @@
 ﻿using ServiceLayer.Dtos.Stadium.Dash;
 using ServiceLayer.Dtos.StadiumImage;
+using ServiceLayer.Utlities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,10 +11,11 @@ namespace ServiceLayer.Services.Interface
 {
     public interface IStadiumImageService
     {
-        Task<bool> RemoveAsync(int id);
-        Task<bool> UpdateAsync(UpdateStadiumImageDto dto);
-        Task CreateAsync(CreateStadiumImageDto dto);
-        Task<DashStadiumImageDto> FindById(int id);
+        Task<IResponse> RemoveAsync(int id);
+        Task<IResponse> UpdateAsync(UpdateStadiumImageDto dto);
+        Task<IResponse> CreateAsync(CreateStadiumImageDto dto);
+        Task<List<DashStadiumImageDto>> FindByIdStadiumImages(int stdiumId);
+        Task<UpdateStadiumImageDto> FindById(int id);
         Task<List<DashStadiumImageDto>> AllAsync();
     }
 }

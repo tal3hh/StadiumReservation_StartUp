@@ -11,6 +11,7 @@ namespace ServiceLayer.Dtos.StadiumImage
         public int Id { get; set; }
         public string? Path { get; set; }
         public bool Main { get; set; }
+        public int stadiumId { get; set; }
         public string? stadiumName { get; set; }
     }
 }

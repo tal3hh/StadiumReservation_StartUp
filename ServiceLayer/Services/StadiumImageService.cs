@@ -31,25 +31,52 @@ namespace ServiceLayer.Services
             return _mapper.Map<List<DashStadiumImageDto>>(list);
         }
 
-        public async Task<DashStadiumImageDto> FindById(int id)
+        public async Task<List<DashStadiumImageDto>> FindByIdStadiumImages(int stdiumId)
+        {
+            var entity = await _context.StadiumImages.Include(x => x.Stadium)
+                                                     .Where(x => x.StadiumId == stdiumId).ToListAsync();
+
+            return _mapper.Map<List<DashStadiumImageDto>>(entity);
+        }
+
+        public async Task<UpdateStadiumImageDto> FindById(int id)
         {
             var entity = await _context.StadiumImages.Include(x => x.Stadium).SingleOrDefaultAsync(x => x.Id == id);
 
-            return _mapper.Map<DashStadiumImageDto>(entity);
+            return _mapper.Map<UpdateStadiumImageDto>(entity);
         }
 
-        public async Task CreateAsync(CreateStadiumImageDto dto)
+        public async Task<IResponse> CreateAsync(CreateStadiumImageDto dto)
         {
+            if (!await _context.Stadiums.AnyAsync(x => x.Id == dto.StadiumId))
+                return new Response(RespType.NotFound, "Stadion tapılmadı.");
+
+            else if (dto.Main == true && await _context.StadiumImages.Where(x => x.StadiumId == dto.StadiumId && x.Main).CountAsync() > 0)
+                return new Response(RespType.BadReqest, "Stadionun bir əsas(main) şəkli ola bilər.");
+
+
             StadiumImage StadiumImage = _mapper.Map<StadiumImage>(dto);
             StadiumImage.CreateDate = DateTimeAz.Now;
             StadiumImage.IsActive = true;
 
             await _context.StadiumImages.AddAsync(StadiumImage);
             await _context.SaveChangesAsync();
+
+            return new Response(RespType.Success, "Şəkil əlavə edildi.");
         }
 
-        public async Task<bool> UpdateAsync(UpdateStadiumImageDto dto)
+        public async Task<IResponse> UpdateAsync(UpdateStadiumImageDto dto)
         {
+            if (!await _context.Stadiums.AnyAsync(x => x.Id == dto.StadiumId))
+                return new Response(RespType.NotFound, "Stadion tapılmadı.");
+
+            else if (dto.Main == true && 
+                await _context.StadiumImages.Where(x => x.StadiumId == dto.StadiumId && x.Main && x.Id != dto.Id).CountAsync() > 0)
+                return new Response(RespType.BadReqest, "Stadionun bir əsas(main) şəkli ola bilər.");
+
+            else if (!await _context.StadiumImages.AnyAsync(x => x.Id == dto.Id))
+                return new Response(RespType.NotFound, "Stadion şəkli tapılmadı.");
+
             StadiumImage? DBStadiumImage = await _context.StadiumImages.SingleOrDefaultAsync(x => x.Id == dto.Id);
 
             if (DBStadiumImage != null)
@@ -59,23 +86,23 @@ namespace ServiceLayer.Services
                 _context.Entry(DBStadiumImage).CurrentValues.SetValues(StadiumImage);
 
                 await _context.SaveChangesAsync();
-                return true;
+                return new Response(RespType.Success, "Stadionun şəkli uğurla dəyişildi.");
             }
-            return false;
+            return new Response(RespType.NotFound, "Stadionun şəkli tapılmadı.");
         }
 
-        public async Task<bool> RemoveAsync(int id)
+        public async Task<IResponse> RemoveAsync(int id)
         {
             StadiumImage? StadiumImage = await _context.StadiumImages.SingleOrDefaultAsync(x => x.Id == id);
 
-            if (StadiumImage is null)
+            if (StadiumImage != null)
             {
                 _context.StadiumImages.Remove(StadiumImage);
                 await _context.SaveChangesAsync();
 
-                return true;
+                return new Response(RespType.Success, "Stadionun şəkli silindi.");
             }
-            return false;
+            return new Response(RespType.NotFound, "Stadionun şəkli tapılmadı.");
         }
     }
 }

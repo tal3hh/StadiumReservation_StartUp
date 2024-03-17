@@ -41,7 +41,7 @@ namespace DashApi.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(dto);
 
-            var result = await _areaService.UpdateAsync(dto);
+            var result = await _areaService.CreateAsync(dto);
 
             if (result.RespType == RespType.NotFound)
                 return NotFound(result.Message);
