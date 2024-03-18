@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using ServiceLayer.Dtos.StadiumDiscount;
 using ServiceLayer.Dtos.StadiumDiscount;
 using ServiceLayer.Services.Interface;
+using ServiceLayer.Utlities;
 
 namespace DashApi.Controllers
 {
@@ -11,57 +12,73 @@ namespace DashApi.Controllers
     public class StadiumDiscountController : ControllerBase
     {
         private readonly IStadiumDiscountService _stadiumDiscountService;
-        private readonly IStadiumService _stadiumService;
-        public StadiumDiscountController(IStadiumDiscountService stadiumDiscountService, IStadiumService stadiumService)
+        public StadiumDiscountController(IStadiumDiscountService stadiumDiscountService)
         {
             _stadiumDiscountService = stadiumDiscountService;
-            _stadiumService = stadiumService;
         }
 
-        [HttpGet("StadiumDiscounts")]
+        [HttpGet]
         public async Task<IActionResult> StadiumDiscounts()
         {
             return Ok(await _stadiumDiscountService.AllAsync());
         }
 
-        [HttpGet("StadiumDiscount/{id}")]
-        public async Task<IActionResult> StadiumDiscounts(int id)
+        [HttpGet("Stadium/{stadiumId}")]
+        public async Task<IActionResult> FindStadiums(int stadiumId)
+        {
+            return Ok(await _stadiumDiscountService.FindByIdStadiums(stadiumId));
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Find(int id)
         {
             return Ok(await _stadiumDiscountService.FindById(id));
         }
 
-        [HttpPost("StadiumDiscount")]
+        [HttpPost("create")]
         public async Task<IActionResult> addStadiumDiscount(CreateStadiumDiscountDto dto)
         {
             if (!ModelState.IsValid) return BadRequest(dto);
 
-            if (await _stadiumService.FindById(dto.StadiumId) == null)
-                return NotFound("Stadium not found");
+            var result = await _stadiumDiscountService.CreateAsync(dto);
 
-            await _stadiumDiscountService.CreateAsync(dto);
+            if (result.RespType == RespType.Success) return Ok(result.Message);
 
-            return Ok();
+            else if (result.RespType == RespType.BadReqest) return BadRequest(result.Message);
+
+            else if (result.RespType == RespType.NotFound) return NotFound(result.Message);
+
+            return BadRequest("Xəta baş verdi.");
         }
 
-        [HttpPut("StadiumDiscount")]
+        [HttpPut("update")]
         public async Task<IActionResult> upadteStadiumDiscount(UpdateStadiumDiscountDto dto)
         {
             if (!ModelState.IsValid) return BadRequest(dto);
 
-            if (await _stadiumService.FindById(dto.StadiumId) == null)
-                return NotFound("Stadium not found");
+            var result = await _stadiumDiscountService.UpdateAsync(dto);
 
-            if (!await _stadiumDiscountService.UpdateAsync(dto)) return NotFound();
+            if (result.RespType == RespType.Success) return Ok(result.Message);
 
-            return Ok();
+            else if (result.RespType == RespType.BadReqest) return BadRequest(result.Message);
+
+            else if (result.RespType == RespType.NotFound) return NotFound(result.Message);
+
+            return BadRequest("Xəta baş verdi.");
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> removeStadiumDiscount(int id)
         {
-            if (!await _stadiumDiscountService.RemoveAsync(id)) return NotFound();
+            var result = await _stadiumDiscountService.RemoveAsync(id);
 
-            return Ok();
+            if (result.RespType == RespType.Success) return Ok(result.Message);
+
+            else if (result.RespType == RespType.BadReqest) return BadRequest(result.Message);
+
+            else if (result.RespType == RespType.NotFound) return NotFound(result.Message);
+
+            return BadRequest("Xəta baş verdi.");
         }
     }
 }

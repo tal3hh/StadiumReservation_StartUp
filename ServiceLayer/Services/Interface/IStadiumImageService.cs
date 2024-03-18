@@ -1,11 +1,5 @@
-﻿using ServiceLayer.Dtos.Stadium.Dash;
-using ServiceLayer.Dtos.StadiumImage;
+﻿using ServiceLayer.Dtos.StadiumImage;
 using ServiceLayer.Utlities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ServiceLayer.Services.Interface
 {

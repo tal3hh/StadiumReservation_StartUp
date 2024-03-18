@@ -8,7 +8,9 @@ namespace ServiceLayer.Dtos.StadiumDiscount
 {
     public class DashStadiumDiscountDto
     {
-        public string? stadiumName { get; set; }
+        public int Id { get; set; }
         public string? Path { get; set; }
+        public string? stadiumName { get; set; }
+        public int stadiumId { get; set; }
     }
 }

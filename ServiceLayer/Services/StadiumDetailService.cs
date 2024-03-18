@@ -5,11 +5,6 @@ using RepositoryLayer.Contexts;
 using ServiceLayer.Dtos.StadiumDetail;
 using ServiceLayer.Services.Interface;
 using ServiceLayer.Utlities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ServiceLayer.Services
 {
@@ -31,11 +26,19 @@ namespace ServiceLayer.Services
             return _mapper.Map<List<DashStadiumDetailDto>>(list);
         }
 
-        public async Task<DashStadiumDetailDto> FindById(int id)
+        public async Task<List<DashStadiumDetailDto>> FindByIdStadiumDetails(int stdiumId)
+        {
+            var entity = await _context.StadiumImages.Include(x => x.Stadium)
+                                                     .Where(x => x.StadiumId == stdiumId).ToListAsync();
+
+            return _mapper.Map<List<DashStadiumDetailDto>>(entity);
+        }
+
+        public async Task<UpdateStadiumDetailDto> FindById(int id)
         {
             var entity = await _context.StadiumDetails.Include(x => x.Stadium).SingleOrDefaultAsync(x => x.Id == id);
 
-            return _mapper.Map<DashStadiumDetailDto>(entity);
+            return _mapper.Map<UpdateStadiumDetailDto>(entity);
         }
 
         public async Task<IResponse> CreateAsync(CreateStadiumDetailDto dto)

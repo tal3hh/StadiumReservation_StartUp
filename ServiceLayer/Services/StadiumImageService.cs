@@ -5,11 +5,6 @@ using RepositoryLayer.Contexts;
 using ServiceLayer.Dtos.StadiumImage;
 using ServiceLayer.Services.Interface;
 using ServiceLayer.Utlities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ServiceLayer.Services
 {

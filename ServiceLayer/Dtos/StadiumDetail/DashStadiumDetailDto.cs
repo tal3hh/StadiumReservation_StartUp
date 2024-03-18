@@ -10,6 +10,7 @@ namespace ServiceLayer.Dtos.StadiumDetail
     {
         public int Id { get; set; }
         public string? description { get; set; }
+        public int stadiumId { get; set; }
         public string? stadiumName { get; set; }
     }
 }

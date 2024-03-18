@@ -1,12 +1,4 @@
-﻿using AutoMapper;
-using AutoMapper.Configuration.Annotations;
-using DomainLayer.Entities;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Migrations.Operations;
-using RepositoryLayer.Contexts;
+﻿using Microsoft.AspNetCore.Mvc;
 using ServiceLayer.Dtos.Stadium.Dash;
 using ServiceLayer.Services.Interface;
 using ServiceLayer.Utlities;
@@ -24,7 +16,7 @@ namespace DashApi.Controllers
             _stadiumService = stadiumService;
         }
 
-        [HttpGet("Stadiums")]
+        [HttpGet]
         public async Task<IActionResult> Stadiums()
         {
             return Ok(await _stadiumService.AllAsync());

@@ -24,6 +24,12 @@ namespace DashApi.Controllers
             return Ok(await _stadiumDetailService.AllAsync());
         }
 
+        [HttpGet("Stadium/{stadiumiId}")]
+        public async Task<IActionResult> FindByStadium(int stadiumiId)
+        {
+            return Ok(await _stadiumDetailService.FindByIdStadiumDetails(stadiumiId));
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> StadiumDetails(int id)
         {
