@@ -44,7 +44,6 @@ namespace ServiceLayer.Services
             DateTime today = DateTimeAz.Now.Date;
             int nowHour = DateTimeAz.Now.Hour + 1;
 
-
             var allStadiumsEmptyHours = stadiums.Select(stadium =>
             {
                 List<int> reservedHours = stadium.Areas
@@ -63,11 +62,10 @@ namespace ServiceLayer.Services
                     .Distinct()
                     .ToList();
 
+
+                // Time Filter
                 List<string> availableHourRanges = new List<string>();
-
                 
-                //Time Filter
-
                 if (stadium.closeHour > nowHour && nowHour > stadium.openHour)
                 {
                     availableHourRanges = Enumerable.Range(nowHour, stadium.closeHour - nowHour)
@@ -273,49 +271,68 @@ namespace ServiceLayer.Services
                 .Include(s => s.Areas)
                 .ThenInclude(a => a.Reservations)
                 .AsQueryable();
+            
 
+            // ADDRESS
             if (!string.IsNullOrEmpty(vm.Address))
                 query = query.Where(x => x.Address.Contains(vm.Address));
 
-            //Price 
+
+            // PRICE 
             if (vm.minPrice > 0 || vm.maxPrice > 0)
             {
-                if (vm.minPrice > vm.maxPrice)
-                    (vm.minPrice, vm.maxPrice) = (vm.maxPrice, vm.minPrice);
-
-                query = query.Where(x => x.minPrice >= vm.minPrice && x.minPrice <= vm.maxPrice);
+                if (vm.minPrice >= vm.maxPrice)
+                    query = query.Where(x => x.minPrice >= vm.minPrice);
+                else
+                    query = query.Where(x => x.minPrice >= vm.minPrice && x.minPrice <= vm.maxPrice);
             }
 
-            List<Stadium> stadiums = await query.ToListAsync();
-
+            // DATE  
             var now = DateTimeAz.Now;
-            //Date
-            DateTime date = vm.Date.Date >= now.Date ? vm.Date.Date : now.Date;
+            DateTime date = vm.Date.Date >= now.Date ? vm.Date.Date : now.Date;  //(kecmis tarix olmasin)
+
+
+            List<Stadium> stadiums = await query.ToListAsync();
 
             List<HomeListStadiumDto> stadiumList = stadiums
                 .Select(stadium =>
                 {
-                    var reservedHours = stadium.Areas
-                          .SelectMany(a => a.Reservations)
-                          .Where(r =>
-                              r.Date.Date == date &&
-                              stadium.Areas.All(a =>
-                            a.Reservations != null &&
-                            a.Reservations.Any(x =>
-                                x.Date.Hour == r.Date.Hour
+                    //var reservedHours = stadium.Areas
+                    //      .SelectMany(a => a.Reservations)
+                    //      .Where(r =>
+                    //          r.Date.Date == date &&
+                    //          stadium.Areas.All(a =>
+                    //        a.Reservations != null &&
+                    //        a.Reservations.Any(x =>
+                    //            x.Date.Hour == r.Date.Hour
+                    //        )
+                    //    )
+                    //      )
+                    //      .GroupBy(r => r.Date.Hour)
+                    //      .Where(grp => grp.Count() == stadium.Areas.Count)
+                    //      .Select(grp => grp.Key)
+                    //      .ToList();
+
+                    List<int> reservedHours = stadium.Areas
+                    .SelectMany(a => a.Reservations)
+                    .Where(r =>
+                        r.Date.Date == date &&
+
+                        stadium.Areas.All(a =>
+                            a.Reservations != null && a.Reservations.Any(x =>
+                                                                         x.Date.Hour == r.Date.Hour
                             )
                         )
-                          )
-                          .GroupBy(r => r.Date.Hour)
-                          .Where(grp => grp.Count() == stadium.Areas.Count)
-                          .Select(grp => grp.Key)
-                          .ToList();
+                    )
+                    .Select(r => r.Date.Hour)
+                    .Distinct()
+                    .ToList();
 
 
-                    //TIME
+                    // Start-End HOUR
                     if (date == now.Date)
                     {
-                        vm.startTime = vm.startTime <= now.Hour ? now.Hour + 1 : vm.startTime;
+                        vm.startTime = vm.startTime <= now.Hour || vm.startTime >= 24 || vm.startTime > vm.endTime ? now.Hour + 1 : vm.startTime;
                         vm.endTime = vm.endTime > 24 || vm.endTime <= vm.startTime ? 24 : vm.endTime;
                     }
                     else
@@ -323,6 +340,7 @@ namespace ServiceLayer.Services
                         vm.startTime = vm.startTime < 0 || vm.startTime >= 24 ? 0 : vm.startTime;
                         vm.endTime = vm.endTime > 24 || vm.endTime <= vm.startTime ? 24 : vm.endTime;
                     }
+
 
                     List<string> availableHourRanges = Enumerable.Range(vm.startTime, vm.endTime - vm.startTime)
                         .Except(reservedHours)

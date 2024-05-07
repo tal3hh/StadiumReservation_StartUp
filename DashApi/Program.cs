@@ -130,7 +130,7 @@ app.UseCors(x => x.AllowAnyOrigin()
                   .AllowAnyHeader());
 
 //TryCatch
-app.UseMiddleware<DashExceptionMiddleware>();
+//app.UseMiddleware<WebExceptionMiddleware>();
 
 app.UseStaticFiles();
 app.UseRouting();

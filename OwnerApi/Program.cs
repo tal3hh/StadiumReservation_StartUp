@@ -126,7 +126,7 @@ app.UseCors(x => x.AllowAnyOrigin()
                   .AllowAnyHeader());
 
 //TryCatch and Log
-app.UseMiddleware<WebExceptionMiddleware>();
+//app.UseMiddleware<WebExceptionMiddleware>();
 
 app.UseSwagger();
 app.UseSwaggerUI();

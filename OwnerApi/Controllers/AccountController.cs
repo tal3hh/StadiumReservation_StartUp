@@ -40,10 +40,8 @@ namespace OwnerApi.Controllers
                 user = await _userManager.FindByNameAsync(dto.UsernameorEmail);
 
             if (user is null)
-            {
-                ModelState.AddModelError("", "Sahibkar tapılmadı");
-                return NotFound(dto);
-            }
+                return NotFound("İstifadəçi tapılmadı");
+
 
             var identity = await _signInManager.PasswordSignInAsync(user, dto.Password, dto.RememberMe, false);
 
@@ -57,7 +55,7 @@ namespace OwnerApi.Controllers
 
                 if (token == null) return BadRequest("Token is null");
 
-                var userStadium = await _context.Stadiums.Include(x => x.AppUser).FirstOrDefaultAsync(x => x.AppUserId == user.Id);
+                Stadium? userStadium = await _context.Stadiums.Include(x => x.AppUser).FirstOrDefaultAsync(x => x.AppUserId == user.Id);
 
                 if (userStadium == null) return NotFound("Bu istifadəçinin stadionu yoxdur.");
 

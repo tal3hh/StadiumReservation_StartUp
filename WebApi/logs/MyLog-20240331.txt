@@ -1,0 +1,35 @@
+2024-03-31 13:20:12.340 +04:00 [INF] Method => GET
+2024-03-31 13:20:13.237 +04:00 [INF] Method => GET
+2024-03-31 13:20:16.942 +04:00 [INF] Method => GET
+2024-03-31 13:23:48.701 +04:00 [INF] Method => GET
+2024-03-31 13:23:48.795 +04:00 [INF] Method => GET
+2024-03-31 13:23:49.068 +04:00 [INF] Method => GET
+2024-03-31 13:23:49.068 +04:00 [INF] Method => GET
+2024-03-31 13:23:49.069 +04:00 [INF] Method => GET
+2024-03-31 13:23:49.590 +04:00 [INF] Method => GET
+2024-03-31 13:23:49.624 +04:00 [INF] Method => GET
+2024-03-31 13:23:55.133 +04:00 [INF] Method => POST
+2024-03-31 13:29:56.194 +04:00 [INF] Method: GET;
+Path: /swagger/index.html;
+Query: ;
+Body: 
+2024-03-31 13:29:57.101 +04:00 [INF] Method: GET;
+Path: /swagger/v1/swagger.json;
+Query: ;
+Body: 
+2024-03-31 13:30:01.571 +04:00 [INF] Method: GET;
+Path: /api/Home/Stadium-orderPrice;
+Query: ;
+Body: 
+2024-03-31 13:33:27.138 +04:00 [INF] Method: GET;
+Path: /swagger/index.html;
+Query: ;
+Body: 
+2024-03-31 13:33:27.690 +04:00 [INF] Method: GET;
+Path: /swagger/v1/swagger.json;
+Query: ;
+Body: 
+2024-03-31 13:33:31.539 +04:00 [INF] Method: GET;
+Path: /api/Home/Stadium-Discount;
+Query: ;
+Body: 
