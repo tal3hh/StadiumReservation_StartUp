@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using ServiceLayer.Common.Result;
 using ServiceLayer.Dtos.Stadium.Dash;
 using ServiceLayer.Services.Interface;
-using ServiceLayer.Utlities;
 
 namespace DashApi.Controllers
 {

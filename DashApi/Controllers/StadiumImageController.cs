@@ -5,10 +5,10 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RepositoryLayer.Contexts;
+using ServiceLayer.Common.Result;
 using ServiceLayer.Dtos.Stadium.Dash;
 using ServiceLayer.Dtos.StadiumImage;
 using ServiceLayer.Services.Interface;
-using ServiceLayer.Utlities;
 
 namespace DashApi.Controllers
 {

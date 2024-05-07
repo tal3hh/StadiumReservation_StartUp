@@ -1,5 +1,5 @@
-﻿using ServiceLayer.Dtos.Reservation.Dash;
-using ServiceLayer.Utlities;
+﻿using ServiceLayer.Common.Result;
+using ServiceLayer.Dtos.Reservation.Dash;
 
 namespace ServiceLayer.Services.Interface
 {

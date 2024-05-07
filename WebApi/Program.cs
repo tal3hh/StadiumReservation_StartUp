@@ -8,8 +8,8 @@ using Microsoft.IdentityModel.Tokens;
 using RepositoryLayer.Contexts;
 using Serilog;
 using ServiceLayer.AutoMapper;
+using ServiceLayer.Common.ExceptionHandler;
 using ServiceLayer.Extensions;
-using ServiceLayer.Utlities;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -132,7 +132,7 @@ app.UseCors(x => x.AllowAnyOrigin()
                   .AllowAnyHeader());
 
 //TryCatch and Log
-app.UseMiddleware<WebExceptionMiddleware>();
+app.UseMiddleware<ExceptionMiddleware>();
 
 app.UseSwagger();
 app.UseSwaggerUI();

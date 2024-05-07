@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using RepositoryLayer.Contexts;
 using ServiceLayer.Services.Interface;
-using ServiceLayer.Utlities;
+using ServiceLayer.Utlities.TimeZone;
 using ServiceLayer.ViewModels;
 
 namespace WebApi.Controllers

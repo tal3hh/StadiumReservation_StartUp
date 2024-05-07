@@ -4,11 +4,11 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RepositoryLayer.Contexts;
+using ServiceLayer.Common.Result;
 using ServiceLayer.Dtos.Reservation.Dash;
 using ServiceLayer.Dtos.Reservation.Home;
 using ServiceLayer.Dtos.Stadium.Home;
 using ServiceLayer.Services.Interface;
-using ServiceLayer.Utlities;
 using ServiceLayer.ViewModels;
 
 namespace OwnerApi.Controllers

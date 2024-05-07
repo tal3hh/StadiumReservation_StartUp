@@ -1,11 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using ServiceLayer.Services.Interface;
+using RepositoryLayer.Repositories;
+using RepositoryLayer.Repository;
 using ServiceLayer.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using ServiceLayer.Services.Interface;
+using ServiceLayer.Utlities.Pagine;
 
 namespace ServiceLayer.Extensions
 {
@@ -21,6 +19,9 @@ namespace ServiceLayer.Extensions
             services.AddScoped<IReservationService, ReservationService>();
 
             services.AddTransient<ITokenService, TokenService>();
+
+            services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+            services.AddScoped(typeof(IPaginate<>), typeof(Paginate<>));
         }
     }
 }

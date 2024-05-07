@@ -1,5 +1,5 @@
-﻿using ServiceLayer.Dtos.Area.Dash;
-using ServiceLayer.Utlities;
+﻿using ServiceLayer.Common.Result;
+using ServiceLayer.Dtos.Area.Dash;
 
 namespace ServiceLayer.Services.Interface
 {

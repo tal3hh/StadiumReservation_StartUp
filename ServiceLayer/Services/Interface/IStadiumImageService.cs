@@ -1,5 +1,5 @@
-﻿using ServiceLayer.Dtos.StadiumImage;
-using ServiceLayer.Utlities;
+﻿using ServiceLayer.Common.Result;
+using ServiceLayer.Dtos.StadiumImage;
 
 namespace ServiceLayer.Services.Interface
 {

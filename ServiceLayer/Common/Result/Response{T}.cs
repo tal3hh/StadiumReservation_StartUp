@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ServiceLayer.Utlities
+namespace ServiceLayer.Common.Result
 {
     public class Response<T> : Response, IResponse<T>
     {

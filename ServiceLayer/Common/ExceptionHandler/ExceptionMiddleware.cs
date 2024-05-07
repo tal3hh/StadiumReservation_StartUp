@@ -2,13 +2,12 @@
 using Serilog;
 using System.Text;
 
-namespace ServiceLayer.Utlities
+namespace ServiceLayer.Common.ExceptionHandler
 {
-    public class WebExceptionMiddleware
+    public class ExceptionMiddleware
     {
         private readonly RequestDelegate _next;
-
-        public WebExceptionMiddleware(RequestDelegate next)
+        public ExceptionMiddleware(RequestDelegate next)
         {
             _next = next;
         }
@@ -40,7 +39,7 @@ namespace ServiceLayer.Utlities
 
         private async Task<string> GetRequestBody(HttpRequest request)
         {
-            
+
             request.EnableBuffering();
             using (var reader = new StreamReader(request.Body, Encoding.UTF8, true, 1024, true))
             {

@@ -1,5 +1,5 @@
-﻿using ServiceLayer.Dtos.StadiumDiscount;
-using ServiceLayer.Utlities;
+﻿using ServiceLayer.Common.Result;
+using ServiceLayer.Dtos.StadiumDiscount;
 
 namespace ServiceLayer.Services.Interface
 {

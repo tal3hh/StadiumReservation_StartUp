@@ -1,6 +1,7 @@
-﻿using ServiceLayer.Dtos.Stadium.Dash;
+﻿using ServiceLayer.Common.Result;
+using ServiceLayer.Dtos.Stadium.Dash;
 using ServiceLayer.Dtos.Stadium.Home;
-using ServiceLayer.Utlities;
+using ServiceLayer.Utlities.Pagine;
 using ServiceLayer.ViewModels;
 
 namespace ServiceLayer.Services.Interface
