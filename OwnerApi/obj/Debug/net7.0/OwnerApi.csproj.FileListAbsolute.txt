@@ -92,3 +92,13 @@ C:\Users\HP\Desktop\StartUp\MiniStadium\OwnerApi\obj\Debug\net7.0\refint\OwnerAp
 C:\Users\HP\Desktop\StartUp\MiniStadium\OwnerApi\obj\Debug\net7.0\OwnerApi.pdb
 C:\Users\HP\Desktop\StartUp\MiniStadium\OwnerApi\obj\Debug\net7.0\OwnerApi.genruntimeconfig.cache
 C:\Users\HP\Desktop\StartUp\MiniStadium\OwnerApi\obj\Debug\net7.0\ref\OwnerApi.dll
+C:\Users\HP\Desktop\StartUp\MiniStadium\OwnerApi\bin\Debug\net7.0\Microsoft.Extensions.DependencyModel.dll
+C:\Users\HP\Desktop\StartUp\MiniStadium\OwnerApi\bin\Debug\net7.0\Serilog.dll
+C:\Users\HP\Desktop\StartUp\MiniStadium\OwnerApi\bin\Debug\net7.0\Serilog.AspNetCore.dll
+C:\Users\HP\Desktop\StartUp\MiniStadium\OwnerApi\bin\Debug\net7.0\Serilog.Extensions.Hosting.dll
+C:\Users\HP\Desktop\StartUp\MiniStadium\OwnerApi\bin\Debug\net7.0\Serilog.Extensions.Logging.dll
+C:\Users\HP\Desktop\StartUp\MiniStadium\OwnerApi\bin\Debug\net7.0\Serilog.Formatting.Compact.dll
+C:\Users\HP\Desktop\StartUp\MiniStadium\OwnerApi\bin\Debug\net7.0\Serilog.Settings.Configuration.dll
+C:\Users\HP\Desktop\StartUp\MiniStadium\OwnerApi\bin\Debug\net7.0\Serilog.Sinks.Console.dll
+C:\Users\HP\Desktop\StartUp\MiniStadium\OwnerApi\bin\Debug\net7.0\Serilog.Sinks.Debug.dll
+C:\Users\HP\Desktop\StartUp\MiniStadium\OwnerApi\bin\Debug\net7.0\Serilog.Sinks.File.dll

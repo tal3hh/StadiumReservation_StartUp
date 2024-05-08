@@ -22,7 +22,6 @@ namespace ServiceLayer.Services.Interface
 
         //Stadium Detail
         Task<HomeDetailStadiumDto> StadiumDetailAsync(int stadiumId);
-        Task<HomeDetailStadiumDto> DateStadiumDetailAsync(StadiumDetailVM vm);
 
 
         //Dash

@@ -3,6 +3,7 @@ using DomainLayer.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using RepositoryLayer.Contexts;
+using RepositoryLayer.Repositories;
 using ServiceLayer.Common.Result;
 using ServiceLayer.Dtos.Stadium.Dash;
 using ServiceLayer.Dtos.Stadium.Home;
@@ -16,29 +17,25 @@ namespace ServiceLayer.Services
     public class StadiumService : IStadiumService
     {
         private readonly AppDbContext _context;
+        private readonly IRepository<Stadium> _repoStad;
         private readonly UserManager<AppUser> _userManager;
         private readonly IMapper _mapper;
-        public StadiumService(AppDbContext context, IMapper mapper, UserManager<AppUser> userManager)
+        public StadiumService(AppDbContext context, IMapper mapper, UserManager<AppUser> userManager, IRepository<Stadium> repoStad)
         {
             _context = context;
             _mapper = mapper;
             _userManager = userManager;
+            _repoStad = repoStad;
         }
 
-        private Paginate<T> PaginateItems<T>(List<T> list, int page, int take)
+        private Paginate<T> PaginateItems<T>(List<T> list, int page = 1, int take = 10) where T : class
         {
-            take = take > 0 ? take : 10;
-
             int totalPages = (int)Math.Ceiling(list.Count / (double)take);
-
-            int currentPage = page > 0 ? page : 1;
-
             var paginatedResult = list
                 .Skip((page - 1) * take)
                 .Take(take)
                 .ToList();
-
-            return new Paginate<T>(paginatedResult, currentPage, totalPages);
+            return new Paginate<T>(paginatedResult, page, totalPages);
         }
 
         private Task<List<HomeListStadiumDto>> TodayEmptyHourStadiums(List<Stadium> stadiums)
@@ -100,7 +97,7 @@ namespace ServiceLayer.Services
 
                     if (stadium.nightHour == 0)
                     {
-                        availableHourRanges = new List<string>();  //gorulmesin (frountcu bu stadionlari "Bu gun bos saat yoxdur." yazsin)
+                        availableHourRanges = new List<string>();  
                     }
                     else
                     {
@@ -141,12 +138,12 @@ namespace ServiceLayer.Services
                     }
                     else
                     {
-                        availableHourRanges = new List<string>();  //gorulmesin (frountcu bu stadionlari "Bu gun bos saat yoxdur." yazsin)
+                        availableHourRanges = new List<string>();  
                     }
                 }
                 else
                 {
-                    availableHourRanges = new List<string>();  //sona alinsin (frountcu bu stadionlari "Bu gun bos saat yoxdur." yazsin)
+                    availableHourRanges = new List<string>();  
                 }
 
 
@@ -167,34 +164,26 @@ namespace ServiceLayer.Services
             return Task.FromResult(allStadiumsEmptyHours);
         }
 
-
         #region Home
-
         public async Task<List<HomeListStadiumDto>> HomeStadiumOrderByListAsync()
         {
-            List<Stadium>? stadiums = await _context.Stadiums
-                .AsNoTracking()
-                .Include(s => s.StadiumImages)
-                .Include(s => s.StadiumDiscounts)
-                .Include(s => s.Areas)
-                .ThenInclude(a => a.Reservations)
-                .OrderBy(x => x.minPrice)
-                .ToListAsync();
-
+            List<Stadium>? stadiums = await _repoStad.GetListAsync(orderBy: x => x.OrderBy(x => x.minPrice),
+                                                                   enableTracking: false,
+                                                                   include: x => x.Include(s => s.StadiumImages)
+                                                                                   .Include(s => s.StadiumDiscounts)
+                                                                                   .Include(s => s.Areas)
+                                                                                   .ThenInclude(a => a.Reservations));
             return await TodayEmptyHourStadiums(stadiums);
         }
 
         public async Task<List<HomeListStadiumDto>> HomeStadiumCompanyListAsync()
         {
-            List<Stadium>? stadiums = await _context.Stadiums
-                .AsNoTracking()
-                .Include(s => s.StadiumImages)
-                .Include(s => s.StadiumDiscounts)
-                .Include(s => s.Areas)
-                .ThenInclude(a => a.Reservations)
-                .Where(s => s.StadiumDiscounts.Any())  //Endirimi olan stadionlar
-                .ToListAsync();
-
+            List<Stadium>? stadiums = await _repoStad.GetListAsync(exp: x => x.StadiumDiscounts.Any(),
+                                                                    enableTracking: false,
+                                                                    include: x => x.Include(s => s.StadiumImages)
+                                                                                   .Include(s => s.StadiumDiscounts)
+                                                                                   .Include(s => s.Areas)
+                                                                                   .ThenInclude(a => a.Reservations));
             return await TodayEmptyHourStadiums(stadiums);
         }
 
@@ -204,39 +193,27 @@ namespace ServiceLayer.Services
         #region Stadiums
         public async Task<Paginate<HomeListStadiumDto>> StadiumListPagineAsync(StadiumPagineVM vm)
         {
-            List<Stadium> stadiums = await _context.Stadiums
-                .AsNoTracking()
-                .Include(s => s.StadiumImages)
-                .Include(s => s.StadiumDiscounts)
-                .Include(s => s.Areas)
-                .ThenInclude(a => a.Reservations)
-                .ToListAsync();
+            List<Stadium> stadiums = await _repoStad.GetListAsync(include: x => x.Include(s => s.StadiumImages)
+                                                                                 .Include(s => s.StadiumDiscounts)
+                                                                                 .Include(s => s.Areas)
+                                                                                 .ThenInclude(a => a.Reservations),
+                                                                    enableTracking: false);
 
             List<HomeListStadiumDto> emptyHourStadiums = await TodayEmptyHourStadiums(stadiums);
-
-            // Paginate
-            var paginateResult = PaginateItems(emptyHourStadiums, vm.page, vm.take);
-
-            return paginateResult;
+            return PaginateItems(emptyHourStadiums, vm.page, vm.take);
         }
 
         public async Task<Paginate<HomeListStadiumDto>> StadiumSearchListPagineAsync(SearchStadiumVM vm)
         {
-            List<Stadium> stadiums = await _context.Stadiums
-                .AsNoTracking()
-                .Include(s => s.StadiumImages)
-                .Include(s => s.StadiumDiscounts)
-                .Include(s => s.Areas)
-                .ThenInclude(a => a.Reservations)
-                .Where(x => x.Name.Contains(vm.search.Trim()))
-                .ToListAsync();
+            List<Stadium> stadiums = await _repoStad.GetListAsync(include: x => x.Include(s => s.StadiumImages)
+                                                                                 .Include(s => s.StadiumDiscounts)
+                                                                                 .Include(s => s.Areas)
+                                                                                 .ThenInclude(a => a.Reservations),
+                                                                    exp: x => x.Name.Contains(vm.search.Trim()),
+                                                                    enableTracking: false);
 
             List<HomeListStadiumDto> emptyHourStadiums = await TodayEmptyHourStadiums(stadiums);
-
-            // Paginate
-            var paginateResult = PaginateItems(emptyHourStadiums, vm.page, vm.take);
-
-            return paginateResult;
+            return PaginateItems(emptyHourStadiums, vm.page, vm.take);
         }
 
         public async Task<Paginate<HomeListStadiumDto>> StadiumFilterListPagineAsync(FilterStadiumVM vm)
@@ -430,77 +407,6 @@ namespace ServiceLayer.Services
             };
 
             return homeDetailStadiumDto;
-        }
-
-        public async Task<HomeDetailStadiumDto> DateStadiumDetailAsync(StadiumDetailVM vm)
-        {
-            //Stadium? stadium = await _context.Stadiums
-            //         .AsNoTracking()
-            //         .Include(s => s.StadiumImages)
-            //         .Include(s => s.StadiumDetails)
-            //         .Include(s => s.StadiumDiscounts)
-            //         .Include(s => s.Areas)
-            //         .ThenInclude(a => a.Reservations)
-            //         .FirstOrDefaultAsync(s => s.Id == vm.stadiumId);
-
-            //if (stadium == null) return new HomeDetailStadiumDto();
-
-            //if (vm.date.Date == DateTimeAz.Today)
-            //    return await StadiumDetailAsync(vm.stadiumId);
-
-            //var reservedHours = stadium.Areas
-            //.SelectMany(a => a.Reservations)
-            //    .Where(r =>
-            //        r.Date.Date == vm.date.Date &&
-            //        r.Date < vm.date.Date.AddDays(1) &&
-            //        stadium.Areas.Any(a => a.Reservations.Any(ar => ar.Date.Hour == r.Date.Hour && ar.Id != r.Id))
-            //    )
-            //    .GroupBy(r => r.Date.Hour)
-            //    .Where(grp => grp.Count() == stadium.Areas.Count)
-            //    .Select(grp => grp.Key)
-            //    .ToList();
-
-            ////SAAT araligi
-            //var availableHourRanges = new List<string>();
-
-            //var time = await _context.TimeStadiums.FirstOrDefaultAsync(x => x.StadiumId == stadium.Id);
-
-            //if (time == null)
-            //{
-            //    availableHourRanges = Enumerable.Range(0, 24)
-            //    .Except(reservedHours)
-            //    .Where(h => (h >= 0 && h < 4) || (h >= 9 && h <= 24))
-            //    .Select(h => $"{h:00}:00-{(h + 1):00}:00")
-            //    .ToList();
-            //}
-            //else
-            //{
-            //    availableHourRanges = Enumerable.Range(0, 24)
-            //    .Except(reservedHours)
-            //    .Where(h => (h >= 0 && h < time.nightTime) || (h >= time.openTime && h <= time.closeTime))
-            //    .Select(h => $"{h:00}:00-{(h + 1):00}:00")
-            //    .ToList();
-            //}
-
-
-            //var homeDetailStadiumDto = new HomeDetailStadiumDto
-            //{
-            //    name = stadium.Name,
-            //    phoneNumber = stadium.PhoneNumber,
-            //    addres = stadium.Address,
-            //    openDay = stadium.openDay,
-            //    closeDay = stadium.closeDay,
-            //    openTime = stadium.openTime,
-            //    closeTime = stadium.closeTime,
-            //    price = stadium.minPrice,
-            //    emptyDates = availableHourRanges,
-            //    descriptions = stadium.StadiumDetails?.Select(x => x.Description).ToList() ?? new List<string?>(),
-            //    discounts = stadium.StadiumDiscounts?.Select(d => d.Path).ToList() ?? new List<string?>(),
-            //    stadiumImages = stadium.StadiumImages?.Select(i => new StadiumImageDto { path = i.Path, main = i.Main }).ToList() ?? new List<StadiumImageDto>()
-            //};
-            //return homeDetailStadiumDto;
-
-            return new HomeDetailStadiumDto();
         }
         #endregion
 

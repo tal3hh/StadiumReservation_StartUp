@@ -27,13 +27,13 @@ namespace WebApi.Controllers
             return Ok(stadiumDetailDto);
         }
 
-        [HttpPost("Filter-Date")]
-        public async Task<IActionResult> StadiumDateFilter(StadiumDetailVM vm)
-        {
-            if (vm.date.Date <= DateTimeAz.Today)
-                return Ok(await _stadiumService.StadiumDetailAsync(vm.stadiumId));
+        //[HttpPost("Filter-Date")]
+        //public async Task<IActionResult> StadiumDateFilter(StadiumDetailVM vm)
+        //{
+        //    if (vm.date.Date <= DateTimeAz.Today)
+        //        return Ok(await _stadiumService.StadiumDetailAsync(vm.stadiumId));
 
-            return Ok(await _stadiumService.DateStadiumDetailAsync(vm));
-        }
+        //    return Ok(await _stadiumService.DateStadiumDetailAsync(vm));
+        //}
     }
 }

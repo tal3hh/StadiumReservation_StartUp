@@ -18,7 +18,6 @@ namespace ServiceLayer.Services
         private readonly IMapper _mapper;
         public ReservationService(IMapper mapper, IRepository<Reservation> repoRes, IRepository<Stadium> repoStad)
         {
-            _context = context;
             _mapper = mapper;
             _repoRes = repoRes;
             _repoStad = repoStad;
